@@ -145,9 +145,6 @@ pub fn main() !void {
 	// caller program  spanwait
 	try mdl.callPgmPid("APPTERM", "Ecursed", pgmPARM_null);
 	
-	try	w.print("stop 1/4 fin\r\n", .{});
-	buf = [_]u8{0} ** 4;
-	_ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
 	//=====================================================
 
 	// initialisation communication
@@ -155,7 +152,6 @@ pub fn main() !void {
 	var LDA = map.masterMmap() catch @panic("erreur system zmmap");
 	getPgmArgs();
 
-	try	w.print("pgmName  {s}\r\n", .{pgmName});
 
 	// parametrage  UDS
 	LDA.init  = pgmName ; // programme Master
@@ -167,30 +163,9 @@ pub fn main() !void {
 	try	w.print("stop 1a/4 fin\r\n", .{});
 
 	udsToLDA(UDS, &LDA);
-	try	w.print("stop 1b/4 fin\r\n", .{});
-	// test 
-		try	w.print("\n LDA.user  {s}", .{LDA.user});
-		try	w.print("\n LDA.Init  {s}", .{LDA.init});
-		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
-		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abord {}",  .{LDA.abord});
-		try	w.print("\n UDS.zua1  {s}", .{UDS.zua1});
-		try	w.print("\n UDS.zua2  {s}", .{UDS.zua2});
-		try	w.print("\n UDS.zua3  {s}", .{UDS.zua3});
-		try	w.print("\n UDS.zun5  {s}", .{UDS.zun5});
-		try	w.print("\n UDS.zu8   {d}", .{UDS.zu8});
-		try	w.print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
-
-
-
-	try	w.print("\nstop 2/4 fin\r\n", .{});
 	map.writeLDA(&LDA);
 
-	try	w.print("\nstop 3/4   look memory fin\r\n", .{});
-	buf = [_]u8{0} ** 4;
-	_ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
 
-	try	w.print("\ngetparm {s}\r\n", .{map.getParm()});
 	// calling program ECHO  spanwait:
 	try mdl.callPgmPid("SH", "Pecho", map.getParm()); 
 							// catch |err| std.debug.panic("err: {any}",.{err});
