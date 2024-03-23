@@ -1,9 +1,3 @@
-	///----------------------
-	/// decimal
-	/// lib C mpdecimal
-	/// zig 0.12.0 dev
-	///---------------------
-
 const std = @import("std");
 const utf = @import("std").unicode;
 
@@ -231,7 +225,7 @@ pub const dcml = struct{
       const allocator = std.heap.page_allocator;
       isValid(cnbr, str) catch | err | {return err ;} ;
       const sVal = allocator.alloc(u8, str.len ) catch unreachable;
-      std.mem.copy(u8, sVal, str);
+      @memcpy( sVal, str);
       c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast(sVal),  &CTX_ADDR );
     }
 
@@ -259,7 +253,7 @@ pub const dcml = struct{
     // round and truncate  5 => + 1
     pub fn round(cnbr: DCMLFX) void {
       const r: [*c]c.mpd_t = c.mpd_qnew();
-      var   i: usize = 1;
+      var i : usize = 1;
       const m: c_int = 10;
       c.mpd_copy(r , cnbr.number , &CTX_ADDR);
       if (cnbr.scale > 0){
@@ -283,7 +277,7 @@ pub const dcml = struct{
     // truncate without rounding 
     pub fn trunc(cnbr: DCMLFX) void {
       const r: [*c]c.mpd_t = c.mpd_qnew();
-      var   i: usize = 1;
+      var i : usize = 1;
       const m: c_int = 10;
       c.mpd_copy(r , cnbr.number , &CTX_ADDR);
       if (cnbr.scale > 0){
@@ -312,7 +306,7 @@ pub const dcml = struct{
 
       var iter = iteratStr.iterator(str);
       var s: usize = 0 ;    // nbr carctère scale
-      var p: bool  = false;   // '.' 
+      var p: bool =false;   // '.' 
       while (iter.next()) |ch|  {
         const x = utf.utf8Decode(ch) catch unreachable;
         switch (x) {
@@ -567,7 +561,7 @@ pub const dcml = struct{
     if (!dcml.DCMLFX.isNumber(str)) return dcmlError.Failed_isNumber_string;
     const allocator = std.heap.page_allocator;
     const sVal = allocator.alloc(u8, str.len ) catch unreachable;
-    std.mem.copy(u8, sVal, str);
+    @memcpy(sVal, str);
     c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast(sVal),&CTX_ADDR );
   }
 
