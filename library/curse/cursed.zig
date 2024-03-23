@@ -497,7 +497,7 @@ pub fn getSize() TermSize {
     var win_size: std.os.linux.winsize = undefined;
 
     const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @intFromPtr(&win_size));
-    if (os.errno(err) != .SUCCESS) {
+    if (std.posix.errno(err) != .SUCCESS) {
         @panic(" Cursed getSize error ioctl TTY");
         //return os.unexpectedErrno(os.errno(err));
     }

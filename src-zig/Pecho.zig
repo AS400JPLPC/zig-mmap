@@ -147,7 +147,7 @@ plog(.Panel).debug("\nldaToUDS(",.{});
 plog(.Panel).debug("{d}",.{nParm});
 plog(.Panel).debug("{s}",.{LDA.zuds});
 plog(.Panel).debug("{}",.{LDA.reply});
-plog(.Panel).debug("{}",.{LDA.abord});
+plog(.Panel).debug("{}",.{LDA.abort});
 		// work traitement:
 		// end traitement
 		LDA.echo = pgmName;
@@ -161,7 +161,7 @@ plog(.Panel).debug("{}",.{LDA.abord});
 plog(.Panel).debug("\nudsToLDA",.{});
 plog(.Panel).debug("{s}",.{LDA.zuds});
 plog(.Panel).debug("{}",.{LDA.reply});
-plog(.Panel).debug("{}",.{LDA.abord});
+plog(.Panel).debug("{}",.{LDA.abort});
 
 plog(.Panel).debug("writeLDA\n",.{});
 		map.writeLDA(&LDA);

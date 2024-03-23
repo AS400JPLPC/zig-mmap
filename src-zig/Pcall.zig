@@ -174,14 +174,13 @@ pub fn main() !void {
 	LDA = map.readLDA();
 	UDS = ldaToUDS(LDA);
 
-	
 
 	if (LDA.reply == true) {
 		try	w.print("\n LDA.user  {s}", .{LDA.user});
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abrod {}",  .{LDA.abord});
+		try	w.print("\n LDA.abrod {}",  .{LDA.abort});
 		
 		try	w.print("\n UDS.zua1  {s}", .{UDS.zua1});
 		try	w.print("\n UDS.zua2  {s}", .{UDS.zua2});

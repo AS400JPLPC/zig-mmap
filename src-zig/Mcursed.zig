@@ -911,7 +911,7 @@ if ( nParm == 1) {
 		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\nLDA.user   {s}", .{LDA.user}) catch unreachable);
 		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.Init  {s}", .{LDA.init}) catch unreachable);
 		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.Echo  {s}", .{LDA.echo}) catch unreachable);
-		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.abord {}",  .{LDA.abord}) catch unreachable);
+		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.abort {}",  .{LDA.abort}) catch unreachable);
 		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
 		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
 		forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
@@ -947,7 +947,7 @@ if ( nParm == 1) {
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Init  {s}", .{LDA.init}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Echo  {s}", .{LDA.echo}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply {}",  .{LDA.reply}) catch unreachable);
-		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abord {}",  .{LDA.abord}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abort {}",  .{LDA.abort}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
@@ -966,7 +966,7 @@ if ( nParm == 1) {
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Init  {s}", .{LDA.init}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Echo  {s}", .{LDA.echo}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply {}",  .{LDA.reply}) catch unreachable);
-		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abord {}",  .{LDA.abord}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abort {}",  .{LDA.abort}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);

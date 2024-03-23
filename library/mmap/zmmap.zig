@@ -96,7 +96,7 @@ pub fn rstEnvMmap() void  {
 //==================================================
 pub const COMLDA = struct { 
 	reply : bool ,
-	abord : bool ,
+	abort : bool ,
 	user : [] const u8 ,
 	init : [] const u8 ,
 	echo : [] const u8 ,
@@ -108,14 +108,14 @@ var LDA : COMLDA = undefined;
 fn initLDA() void {
 	LDA = COMLDA{
 		.reply = true ,
-		.abord = false,
+		.abort = false,
 		.user = undefined ,
 		.init = undefined ,
 		.echo = undefined ,
 		 // alpha numeric
 		.zuds = undefined , 
 		};
-	LDA.user = std.os.getenv("USER") orelse "INITLDA";
+	LDA.user = std.posix.getenv("USER") orelse "INITLDA";
 }
 
 
@@ -222,15 +222,15 @@ fn readTAG() void {
 	var zlen :usize =  COM.ZTAG.getEndPos() catch unreachable;
 
 
-	const  rcvtag = std.os.mmap(
+	const  rcvtag = std.posix.mmap(
 		null,
 		@sizeOf(u8) * zlen ,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZTAG.handle,
 		0
 	) catch @panic(" violation intégrité readTAG rcvtag ") ;  // si pblm violation intégrité
-	defer std.os.munmap(rcvtag);
+	defer std.posix.munmap(rcvtag);
 
 	var ztag: [:0]u8 = undefined ;
 	ztag = std.fmt.allocPrintZ(allocZmmap,"{s}",.{rcvtag}) catch unreachable;
@@ -267,15 +267,15 @@ fn writeTAG() void {
 
 	COM.ZTAG.setEndPos(ztag.len) catch unreachable;
 	
-	const  sendtag = std.os.mmap(
+	const  sendtag = std.posix.mmap(
 		null,
 		@sizeOf(u8) * ztag.len,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZTAG.handle,
 		0
 	) catch @panic(" violation intégrité zmmap writeTAG") ;  // si pblm violation intégrité
-	defer std.os.munmap(sendtag);
+	defer std.posix.munmap(sendtag);
 	
 	std.mem.copyForwards(u8, sendtag,ztag);
 
@@ -380,15 +380,15 @@ pub fn masterMmap() ! COMLDA {
 
 	COM.ZKEY.setEndPos(zkey.len) catch unreachable;
 	
-	const  sendkey = std.os.mmap(
+	const  sendkey = std.posix.mmap(
 		null,
 		@sizeOf(u8) * zkey.len,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZKEY.handle,
 		0
 	) catch @panic(" violation intégrité initMAP fileKEY") ; 
-	defer std.os.munmap(sendkey);
+	defer std.posix.munmap(sendkey);
 
 	std.mem.copyForwards(u8, sendkey,zkey);
 
@@ -413,15 +413,15 @@ pub fn masterMmap() ! COMLDA {
 
 	COM.ZNONCE.setEndPos(znonce.len) catch unreachable;
 
-	const sendnonce = std.os.mmap(
+	const sendnonce = std.posix.mmap(
 		null,
 		@sizeOf(u8) * znonce.len,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZNONCE.handle,
 		0
 	) catch @panic(" violation intégrité initMAP fileNONCE") ;
-	defer std.os.munmap(sendnonce);
+	defer std.posix.munmap(sendnonce);
 
 	std.mem.copyForwards(u8, sendnonce,znonce);
 
@@ -442,15 +442,15 @@ pub fn masterMmap() ! COMLDA {
 
 	COM.ZTAG.setEndPos(ztag.len) catch unreachable;
 
-	const sendtag = std.os.mmap(
+	const sendtag = std.posix.mmap(
 		null,
 		@sizeOf(u8) * ztag.len,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZTAG.handle,
 		0
 	)  catch @panic(" violation intégrité initMAP fileTAG") ;
-	defer std.os.munmap(sendtag);
+	defer std.posix.munmap(sendtag);
 	
 	std.mem.copyForwards(u8, sendtag,ztag);
 
@@ -489,15 +489,15 @@ pub fn echoMmap(timesParm : [] const u8 ) !COMLDA {
 
 	var zlen :usize =  COM.ZKEY.getEndPos() catch unreachable;
  
-	const rcvkey = std.os.mmap(
+	const rcvkey = std.posix.mmap(
 		null,
 		@sizeOf(u8) * zlen,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZKEY.handle,
 		0
 	) catch @panic(" violation intégrité echoMAP fileKEY") ;  
-	defer std.os.munmap(rcvkey);
+	defer std.posix.munmap(rcvkey);
 
 
 	for ( 0.. COM.key.len - 1) |x| {COM.key[x]= 0; }
@@ -517,15 +517,15 @@ pub fn echoMmap(timesParm : [] const u8 ) !COMLDA {
 	zlen = COM.ZNONCE.getEndPos() catch unreachable;
 
 
-	const rcvnonce = std.os.mmap(
+	const rcvnonce = std.posix.mmap(
 		null,
 		@sizeOf(u8) * zlen,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZNONCE.handle,
 		0
 	) catch @panic(" violation intégrité echoMAP fileZNONCE") ;
-	defer std.os.munmap(rcvnonce);
+	defer std.posix.munmap(rcvnonce);
 
 	for ( 0.. COM.nonce.len - 1) |x| { COM.nonce[x]= 0; }
 	var itb = std.mem.splitScalar(u8, rcvnonce[0..zlen], '|');
@@ -544,15 +544,15 @@ pub fn echoMmap(timesParm : [] const u8 ) !COMLDA {
 	zlen = COM.ZTAG.getEndPos() catch unreachable;
 
 
-	const rcvtag = std.os.mmap(
+	const rcvtag = std.posix.mmap(
 		null,
 		@sizeOf(u8) * zlen,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZTAG.handle,
 		0
 	) catch @panic(" violation intégrité echoMAP fileZNONCE") ;
-	defer std.os.munmap(rcvtag);
+	defer std.posix.munmap(rcvtag);
 
 	for ( 0.. COM.tag.len - 1) |x| { COM.tag[x]= 0; }
 	var itc = std.mem.splitScalar(u8, rcvtag[0..zlen], '|');
@@ -591,7 +591,7 @@ pub fn  writeLDA( vLDA:*COMLDA) void {
 //--------------------------------------------------------
 // reply = true  return message
 // reply = false return not found answer 
-// abord = true  caller exit not reply 
+// abort = true  caller exit not reply 
 //--------------------------------------------------------
 
 	
@@ -600,7 +600,7 @@ pub fn  writeLDA( vLDA:*COMLDA) void {
 		"{}|{}|{s}|{s}|{s}"
 		,.{
 			vLDA.reply,
-			vLDA.abord,
+			vLDA.abort,
 			vLDA.user,
 			vLDA.init,
 			vLDA.echo,
@@ -610,16 +610,16 @@ pub fn  writeLDA( vLDA:*COMLDA) void {
 
 	COM.ZLOG.setEndPos(ztext.len) catch unreachable;
 
-	const  sendlog = std.os.mmap(
+	const  sendlog = std.posix.mmap(
 		null,
 		@sizeOf(u8) * ztext.len,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZLOG.handle,
 		0
 	) catch |err| @panic(std.fmt.allocPrintZ(allocZmmap,"{}",.{err}) catch unreachable);
 
-	defer std.os.munmap(sendlog);
+	defer std.posix.munmap(sendlog);
 
 	// Write file via mmap
 	std.mem.copyForwards(u8, sendlog,ztext);
@@ -636,16 +636,16 @@ pub fn  writeLDA( vLDA:*COMLDA) void {
 
 	COM.ZUDS.setEndPos(cipher.len) catch unreachable;
 
-	const  senduds = std.os.mmap(
+	const  senduds = std.posix.mmap(
 		null,
 		@sizeOf(u8) * cipher.len,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZUDS.handle,
 		0
 	) catch |err| @panic(std.fmt.allocPrintZ(allocZmmap,"{}",.{err}) catch unreachable);
 
-	defer std.os.munmap(senduds);
+	defer std.posix.munmap(senduds);
 
 	// Write file via mmap
 	std.mem.copyForwards(u8, senduds,cipher);
@@ -662,15 +662,15 @@ pub fn readLDA() COMLDA {
 	var zlen :usize =  COM.ZLOG.getEndPos() catch unreachable;
 
 
-	const  rcvlog = std.os.mmap(
+	const  rcvlog = std.posix.mmap(
 		null,
 		@sizeOf(u8) * zlen ,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZLOG.handle,
 		0
 	) catch |err| @panic(std.fmt.allocPrintZ(allocZmmap,"{}",.{err}) catch unreachable);
-	defer  std.os.munmap(rcvlog);
+	defer  std.posix.munmap(rcvlog);
 
 
 	var it = std.mem.splitScalar(u8, rcvlog, '|');
@@ -683,8 +683,8 @@ pub fn readLDA() COMLDA {
 				else  LDA.reply = false;
 			},
 			1 =>{
-				if (std.mem.eql(u8,chunk, "true")) LDA.abord = true
-				else  LDA.abord = false;
+				if (std.mem.eql(u8,chunk, "true")) LDA.abort = true
+				else  LDA.abort = false;
 			},
 			2  => LDA.user = std.fmt.allocPrintZ(allocZmmap,"{s}",.{chunk}) catch unreachable,
 			3  => LDA.init = std.fmt.allocPrintZ(allocZmmap,"{s}",.{chunk}) catch unreachable,
@@ -700,15 +700,15 @@ pub fn readLDA() COMLDA {
 	zlen  =  COM.ZUDS.getEndPos() catch unreachable;
 
 
-	const  rcvuds = std.os.mmap(
+	const  rcvuds = std.posix.mmap(
 		null,
 		@sizeOf(u8) * zlen ,
-		std.os.PROT.READ | std.os.PROT.WRITE,
+		std.posix.PROT.READ | std.posix.PROT.WRITE,
 		.{.TYPE =.SHARED_VALIDATE} ,
 		COM.ZUDS.handle,
 		0
 	) catch |err| @panic(std.fmt.allocPrintZ(allocZmmap,"{}",.{err}) catch unreachable);
-	defer  std.os.munmap(rcvuds);
+	defer  std.posix.munmap(rcvuds);
 
 
 	readTAG();

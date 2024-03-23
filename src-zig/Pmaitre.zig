@@ -163,7 +163,7 @@ pub fn main() !void {
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abord {}",  .{LDA.abord});
+		try	w.print("\n LDA.abort {}",  .{LDA.abort});
 		try	w.print("\n LDA.zua1  {s}", .{UDS.zua1});
 		try	w.print("\n LDA.zua2  {s}", .{UDS.zua2});
 		try	w.print("\n LDA.zua3  {s}", .{UDS.zua3});
@@ -194,7 +194,7 @@ pub fn main() !void {
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abord {}",  .{LDA.abord});
+		try	w.print("\n LDA.abort {}",  .{LDA.abort});
 		try	w.print("\n LDA.zua1  {s}", .{UDS.zua1});
 		try	w.print("\n LDA.zua2  {s}", .{UDS.zua2});
 		try	w.print("\n LDA.zua3  {s}", .{UDS.zua3});
@@ -231,7 +231,7 @@ pub fn main() !void {
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abord {}",  .{LDA.abord});
+		try	w.print("\n LDA.abort {}",  .{LDA.abort});
 		try	w.print("\n LDA.zua1  {s}", .{UDS.zua1});
 		try	w.print("\n LDA.zua2  {s}", .{UDS.zua2});
 		try	w.print("\n LDA.zua3  {s}", .{UDS.zua3});
@@ -258,7 +258,7 @@ pub fn main() !void {
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abord {}",  .{LDA.abord});
+		try	w.print("\n LDA.abort {}",  .{LDA.abort});
 		try	w.print("\n LDA.zua1  {s}", .{UDS.zua1});
 		try	w.print("\n LDA.zua2  {s}", .{UDS.zua2});
 		try	w.print("\n LDA.zua3  {s}", .{UDS.zua3});
@@ -287,7 +287,7 @@ pub fn main() !void {
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abord {}",  .{LDA.abord});
+		try	w.print("\n LDA.abort {}",  .{LDA.abort});
 		try	w.print("\n LDA.zua1  {s}", .{UDS.zua1});
 		try	w.print("\n LDA.zua2  {s}", .{UDS.zua2});
 		try	w.print("\n LDA.zua3  {s}", .{UDS.zua3});
