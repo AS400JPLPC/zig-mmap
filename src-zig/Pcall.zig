@@ -141,9 +141,9 @@ pub fn main() !void {
 	// spéciale test call pgm
 	// test calling not parameter
 	// émulation décisionel
-	const pgmPARM_null : ?[] const u8 = null;
-	// caller program  spanwait
-	try mdl.callPgmPid("APPTERM", "Ecursed", pgmPARM_null);
+	// const pgmPARM_null : ?[] const u8 = null;
+	// // caller program  spanwait
+	// try mdl.callPgmPid("APPTERM", "Mcursed", pgmPARM_null);
 	
 	//=====================================================
 
@@ -167,7 +167,7 @@ pub fn main() !void {
 
 
 	// calling program ECHO  spanwait:
-	try mdl.callPgmPid("SH", "Pecho", map.getParm()); 
+	try mdl.callPgmPid("APPTERM", "Mcursed", map.getParm()); 
 							// catch |err| std.debug.panic("err: {any}",.{err});
 	
 	// retrive group datarea
@@ -180,7 +180,7 @@ pub fn main() !void {
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
-		try	w.print("\n LDA.abrod {}",  .{LDA.abort});
+		try	w.print("\n LDA.abort {}",  .{LDA.abort});
 		
 		try	w.print("\n UDS.zua1  {s}", .{UDS.zua1});
 		try	w.print("\n UDS.zua2  {s}", .{UDS.zua2});

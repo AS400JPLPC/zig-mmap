@@ -1,5 +1,5 @@
 	///-----------------------
-	/// module forms 
+	/// forms 
 	/// Label
 	/// button
 	/// cadre
@@ -165,11 +165,16 @@ pub const ErrForms = error{
 				fld_getFunc_Index_invalide,
 				fld_getTask_Index_invalide,
 				fld_getCall_Index_invalide,
+				fld_getTypeCall_Index_invalide,
+				fld_getParmCall_Index_invalide,
 				fld_getAttribut_Index_invalide,
 				fld_getAtrProtect_Index_invalide,
 				fld_getActif_Index_invalide,
 
 				fld_setText_Index_invalide,
+				fld_setName_Index_invalide,
+				fld_setRefType_Index_invalide,
+				fld_setWidth_Index_invalide,
 				fld_setSwitch_Index_invalide,
 				fld_setProtect_Index_invalide,
 				fld_setRequier_Index_invalide,
@@ -177,6 +182,8 @@ pub const ErrForms = error{
 				fld_setRegex_Index_invalide,
 				fld_setTask_Index_invalide,
 				fld_setCall_Index_invalide,
+				fld_setTypeCall_Index_invalide,
+				fld_setParmCall_Index_invalide,
 				fld_setActif_Index_invalide,
 
 				fld_dltRows_Index_invalide,
@@ -1160,6 +1167,16 @@ pub const	fld = struct {
 			.foregr = term.ForegroundColor.fgCyan,
 	};
 
+	// associated field and call program 
+	pub var AtrCall : term.ZONATRB = .{
+			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle),
+										@intFromEnum(term.Style.notStyle)},
+			.backgr = term.BackgroundColor.bgBlack,
+			.foregr = term.ForegroundColor.fgYellow
+	};
+	
 	pub var AtrCursor : term.ZONATRB = .{
 			.styled=[_]u32{@intFromEnum(term.Style.notStyle),
 										@intFromEnum(term.Style.notStyle),
@@ -1187,6 +1204,7 @@ pub const	fld = struct {
 		posy:	 usize,
 		attribut:term.ZONATRB,
 		atrProtect:term.ZONATRB,
+		atrCall:term.ZONATRB,
 		reftyp:   REFTYP,
 		width:	usize,
 		scal:	 usize,
@@ -1212,6 +1230,10 @@ pub const	fld = struct {
 
 		progcall: []const u8,	//name call
 
+		typecall: []const u8,	//type call  SH / APPTERM
+
+		parmcall: bool,			// parm call  Yes/No
+
 		actif:bool,
 	};
 
@@ -1231,6 +1253,8 @@ pub const	fld = struct {
 		procfunc,
 		proctask,
 		progcall,
+		typecall,
+		parmcall,
 		regex
 	};
 
@@ -1283,8 +1307,11 @@ pub const	fld = struct {
 			.procfunc ="",
 			.proctask ="",
 			.progcall ="",
+			.typecall ="",
+			.parmcall = false,
 			.attribut   = AtrField,
 			.atrProtect = AtrProtect,
+			.atrCall    = AtrCall,
 			.actif	= true
 		};
 		if (vregex.len > 0 ) xfield.regex = std.fmt.allocPrint(allocatorForms,
@@ -1464,8 +1491,11 @@ pub const	fld = struct {
 					.procfunc ="",
 					.proctask ="",
 					.progcall ="",
+					.typecall ="",
+					.parmcall = false,
 					.attribut   = AtrField,
 					.atrProtect = AtrProtect,
+					.atrCall    = AtrCall,
 					.actif	= true
 				};
 										
@@ -1503,8 +1533,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1551,8 +1584,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1601,8 +1637,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1651,8 +1690,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1700,8 +1742,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1752,8 +1797,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 			};
 
@@ -1802,8 +1850,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1848,8 +1899,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 			xfield.nbrcar = xfield.width + xfield.scal	+ 1 ;
@@ -1895,8 +1949,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -1950,8 +2007,11 @@ pub const	fld = struct {
 				.procfunc ="",
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -2006,8 +2066,11 @@ pub const	fld = struct {
 				.procfunc =vprocfunc,
 				.proctask ="",
 				.progcall ="",
+				.typecall ="",
+				.parmcall = false,
 				.attribut   = AtrField,
 				.atrProtect = AtrProtect,
+				.atrCall    = AtrCall,
 				.actif	= true
 		};
 
@@ -2105,6 +2168,14 @@ pub const	fld = struct {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].progcall;
 		return ErrForms.fld_getCall_Index_invalide ;
 	}
+	pub fn getTypeCall(vpnl: *pnl.PANEL , n: usize)	ErrForms ! [] const u8 {
+		if ( n < vpnl.field.items.len) return vpnl.field.items[n].typecall;
+		return ErrForms.fld_getTypeCall_Index_invalide ;
+	}
+	pub fn getParmCall(vpnl: *pnl.PANEL , n: usize)	ErrForms ! bool {
+		if ( n < vpnl.field.items.len) return vpnl.field.items[n].parmcall;
+		return ErrForms.fld_getParmCall_Index_invalide ;
+	}
 	pub fn getAttribut(vpnl: *pnl.PANEL , n: usize)	ErrForms ! term.ZONATRB {
 		if ( n < vpnl.field.items.len) return vpnl.field.items[n].atribut;
 		return ErrForms.fld_getAttribut_Index_invalide ;
@@ -2158,6 +2229,14 @@ pub const	fld = struct {
 	pub fn setCall(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].progcall = val
 		else return ErrForms.fld_setCall_Index_invalide;
+	}
+	pub fn setTypeCall(vpnl: *pnl.PANEL , n: usize, val :[]const u8)	ErrForms ! void {
+		if ( n < vpnl.field.items.len) vpnl.field.items[n].typecall = val
+		else return ErrForms.fld_setTypeCall_Index_invalide ;
+	}
+	pub fn setParmCall(vpnl: *pnl.PANEL , n: usize, val :bool)	ErrForms ! void {
+		if ( n < vpnl.field.items.len) vpnl.field.items[n].parmcall = val
+		else return ErrForms.fld_setParmCall_Index_invalide ;
 	}
 	pub fn setActif(vpnl: *pnl.PANEL , n: usize, val :bool)	ErrForms ! void {
 		if ( n < vpnl.field.items.len) vpnl.field.items[n].actif = val
@@ -2215,8 +2294,11 @@ pub const	fld = struct {
 		while (nn < vfld.nbrcar) : (nn += 1 ) {
 			if (vfld.actif == true) {
 				vpnl.buf.items[n].ch = " " ;
-				if (vfld.protect == false) vpnl.buf.items[n].attribut = vfld.attribut
-				else vpnl.buf.items[n].attribut	= vpnl.attribut;
+				if (vfld.protect == true) vpnl.buf.items[n].attribut = vfld.atrProtect
+				else {
+					if (std.mem.eql(u8,vfld.progcall ,"")) vpnl.buf.items[n].attribut = vpnl.attribut
+					else vpnl.buf.items[n].attribut = vfld.atrCall;
+				}
 				vpnl.buf.items[n].on = true;
 			}
 			else {
@@ -2254,7 +2336,10 @@ pub const	fld = struct {
 				if (vfld.protect) vpnl.buf.items[n].attribut = vfld.atrProtect
 				else {
 						if (nile)vpnl.buf.items[n].attribut	= AtrNil
-						else vpnl.buf.items[n].attribut = vfld.attribut;
+						else {
+							if (std.mem.eql(u8,vfld.progcall ,"")) vpnl.buf.items[n].attribut = vpnl.attribut
+							else vpnl.buf.items[n].attribut = vfld.atrCall;
+						}
 				}
 
 			}
@@ -2602,7 +2687,7 @@ pub const	fld = struct {
 						if (	vfld.help.len > 0 ) msgHelp(vpnl,vfld);
 					},
 					.ctrlP => {
-						// Call pgm is call 
+						// Call pgm
 						if ( vfld.progcall.len > 0) {
 							Fkey.Key = kbd.call;
 							break; 

@@ -195,8 +195,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										)
 	) catch unreachable ;
 	
-	//fld.setCall(Panel,fld.getIndex(Panel,"alpha") catch unreachable,"exCallpgm") catch unreachable; // test appel pgm
-		
+	
 	Panel.field.append(fld.newFieldAlphaUpper("alphaU",6,32,					// Name , posx posy
 										30,										// width
 										"ABCD",									// text
@@ -593,44 +592,6 @@ pub const FnEnum = enum {
 var callFunc: FnEnum = undefined;
 
 
-/// run emun Function ex: combo
-pub const FnProg = enum {
-	exCallpgm,
-	none,
-
-	pub fn run(self: FnProg, vpnl : *pnl.PANEL, vfld: *fld.FIELD ) void	{
-		const pgmParm : ?[] const u8 = null;
-		switch (self) {
-			.exCallpgm=> {
-				mdl.callPgmPid("APPTERM",vfld.progcall,pgmParm) 
-						catch |err | switch(err)  {
-								mdl.ErrChild.Module_Invalid => {
-								const msgerr  = std.fmt.allocPrint(utl.allocUtl,
-								" module {s} invalide appeller service Informatique ",
-								.{vfld.progcall}) catch unreachable;
-								defer utl.allocUtl.free(msgerr);
-								forms.debeug(9999,msgerr);
-								},
-								else => unreachable,
-						};
-					
-			},
-			else => dsperr.errorForms(vpnl, Error.main_function_Enum_invalide),
-		}
-	}
-
-	fn searchFn ( vtext: [] const u8 ) FnProg {
-	var i	 :usize = 0;
-	const max :usize = @typeInfo(FnProg).Enum.fields.len;
-		while( i < max ) : (i += 1) {
-		if ( std.mem.eql(u8, @tagName(@as(FnProg,@enumFromInt(i))), vtext)) return @as(FnProg,@enumFromInt(i));
-		}
-		return FnProg.none;
-
-	}
-};
-var callProg: FnProg = undefined;
-
 
 pub fn deinitWrk() void {
 	term.deinitTerm();
@@ -775,7 +736,7 @@ pub fn main() !void {
 	// open terminal and config and offMouse , cursHide->(cursor hide)
 	term.enableRawMode();
 	defer term.disableRawMode() ;
-
+	term.titleTerm("Ecursed");
 	// define Panel
 	var pFmt01 = Panel_Fmt01();
 
@@ -803,11 +764,6 @@ pub fn main() !void {
 			.func => {
 			callFunc = FnEnum.searchFn(pFmt01.field.items[pFmt01.idxfld].procfunc); // User clicks "increment"
 			callFunc.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
-			},
-
-			.call => {
-			callProg = FnProg.searchFn(pFmt01.field.items[pFmt01.idxfld].progcall); // call programe ex: Exemple
-			callProg.run(pFmt01, &pFmt01.field.items[pFmt01.idxfld]);
 			},
 
 			.F2 => {
@@ -940,7 +896,7 @@ pub fn main() !void {
 //-------------------
 
 	getPgmArgs();
-	
+
 if (nParm == 2 ) {
 	var UDS =initUDS();
 	var LDA = map.echoMmap(pgmPARM) 
@@ -960,6 +916,7 @@ if (nParm == 2 ) {
 	LDA.reply = true;
 	UDS.zua1  = "j'ai bien reçu votre message";
 	UDS.zua3  = "Jean-Pierre";
+	UDS.zua   = "Jean-Pierre";
 	UDS.zun5  = "0";
 	UDS.zu8   = 50;
 	UDS.zcomit = true;

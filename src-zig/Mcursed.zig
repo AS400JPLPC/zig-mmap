@@ -154,14 +154,14 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 					"alpha",
 					5, 32,	// Name , posx posy
 					30, 	// width
-					"abcd", // text
+					"call", // text
 					true,	// tofill
 					"required", // error msg
 					"please enter text Alpha crtl+p call Exemple", // help
 					"^[a-zA-Z]{1,}$", // regex
 	)) catch unreachable;
 
-	fld.setCall(Panel,fld.getIndex(Panel,"alpha") catch unreachable,"Ecurse") catch unreachable; // test appel pgm
+	fld.setCall(Panel,fld.getIndex(Panel,"alpha") catch unreachable,"Ecursed") catch unreachable; // test appel pgm
 
 	Panel.field.append(fld.newFieldAlphaUpper(
 					"alphaU",
@@ -550,13 +550,13 @@ var callFunc: FnEnum = undefined;
 
 /// run emun Function ex: combo
 pub const FnProg = enum {
-	Ecurse,
+	Ecursed,
 	none,
 
 	pub fn run(self: FnProg, vpnl: *pnl.PANEL, vfld: *fld.FIELD) void {
 		const pgmParm : ?[] const u8 = null;
 		switch (self) {
-			.Ecurse => {
+			.Ecursed => {
 				mdl.callPgmPid("APPTERM", vfld.progcall,pgmParm) catch |err| switch (err) {
 					mdl.ErrChild.Module_Invalid => {
 						const msgerr = std.fmt.allocPrint(utl.allocUtl, " module {s} invalide appeller service Informatique ", .{vfld.progcall}) catch unreachable;
@@ -718,11 +718,16 @@ fn getPgmArgs() void {
 pub fn main() !void {
 	// initialisation communication
 	getPgmArgs();
-
+	var UDS : COMUDS = initUDS();
+	var LDA : map.COMLDA = undefined;
+	if ( nParm == 2) {
+	LDA = map.masterMmap() catch @panic("erreur system zmmap");
+	map.savEnvMmap() ;
+	}
 
 	// open terminal and config and offMouse , cursHide->(cursor hide)
 	term.enableRawMode();
-
+	term.titleTerm("Mcursed");
 	// pour le test Zmmap not defer
 	//defer term.disableRawMode();
 
@@ -886,11 +891,10 @@ pub fn main() !void {
 
 // ici on ferme le terminal
 term.disableRawMode();
-	
-	var UDS : COMUDS = initUDS();
-	var LDA : map.COMLDA = undefined;
-if ( nParm == 1) {
-	LDA = map.masterMmap() catch @panic("erreur system zmmap");
+// 2 = callpgmid
+if ( nParm == 2) {
+	map.rstEnvMmap();
+	// LDA = map.masterMmap() catch @panic("erreur system zmmap");
 	LDA.init = pgmName;
 	UDS.zua1 = "bonjour";
 	UDS.zua2 = "Nom";
@@ -928,12 +932,24 @@ if ( nParm == 1) {
 	LDA.init = pgmName;
 	UDS.zua1 = "bonjour";
 	UDS.zua2 = "Nom";
+	UDS.zua5 = "call Ecursed and parameter";
 	UDS.zua3 = "";
 	UDS.zun5 = "123456.0123";
 
 	// transmit the request
 	udsToLDA(UDS, &LDA);
 	map.writeLDA(&LDA);
+
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.user  {s}", .{LDA.user}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Init  {s}", .{LDA.init}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Echo  {s}", .{LDA.echo}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply {}",  .{LDA.reply}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abort {}",  .{LDA.abort}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua5  {s}", .{UDS.zua5}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zun5  {s}", .{UDS.zun5}) catch unreachable);
 	forms.debeug(50,"\ncall and flash only test");
 	// caller program  spanwait
 	try mdl.callPgmPid("APPTERM", "Ecursed", map.getParm());
@@ -951,6 +967,7 @@ if ( nParm == 1) {
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua5  {s}", .{UDS.zua5}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zun5  {s}", .{UDS.zun5}) catch unreachable);
 	} else forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply : {} not found request ", .{LDA.reply}) catch unreachable);
 	
@@ -970,6 +987,7 @@ if ( nParm == 1) {
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
+		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua5  {s}", .{UDS.zua5}) catch unreachable);
 		forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zun5  {s}", .{UDS.zun5}) catch unreachable);
 	} else forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply : {} not found request ", .{LDA.reply}) catch unreachable);
 	
