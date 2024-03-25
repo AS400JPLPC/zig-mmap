@@ -94,30 +94,79 @@ pub const grd = struct {
 	}
 
 	// define attribut default GRID
-	pub var AtrGrid: term.ZONATRB = .{ .styled = [_]u32{ @intFromEnum(term.Style.styleDim), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) }, .backgr = term.BackgroundColor.bgBlack, .foregr = term.ForegroundColor.fgGreen };
+	pub var AtrGrid: term.ZONATRB = .{ .styled = [_]u32{
+		@intFromEnum(term.Style.styleDim),
+		@intFromEnum(term.Style.notStyle),
+		@intFromEnum(term.Style.notStyle),
+		@intFromEnum(term.Style.notStyle) },
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgGreen };
 
 	// define attribut default TITLE GRID
-	pub var AtrTitle: term.ZONATRB = .{ .styled = [_]u32{ @intFromEnum(term.Style.styleDim), @intFromEnum(term.Style.styleUnderscore), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) }, .backgr = term.BackgroundColor.bgBlack, .foregr = term.ForegroundColor.fgGreen };
+	pub var AtrTitle: term.ZONATRB = .{ .styled = [_]u32{
+		@intFromEnum(term.Style.styleDim),
+		@intFromEnum(term.Style.styleUnderscore),
+		@intFromEnum(term.Style.notStyle),
+		@intFromEnum(term.Style.notStyle) },
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgGreen };
 
 	// define attribut default CELL GRID
-	pub var AtrCell: term.ZONATRB = .{ .styled = [_]u32{ @intFromEnum(term.Style.styleItalic), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) }, .backgr = term.BackgroundColor.bgBlack, .foregr = term.ForegroundColor.fgCyan };
+	pub var AtrCell: term.ZONATRB = .{ .styled = [_]u32{
+		@intFromEnum(term.Style.styleItalic),
+		@intFromEnum(term.Style.notStyle),
+		@intFromEnum(term.Style.notStyle),
+		@intFromEnum(term.Style.notStyle) },
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgCyan };
 
 	// define attribut default CELL GRID
-	pub var AtrCellBar: term.ZONATRB = .{ .styled = [_]u32{ @intFromEnum(term.Style.styleReverse), @intFromEnum(term.Style.styleItalic), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) }, .backgr = term.BackgroundColor.bgBlack, .foregr = term.ForegroundColor.fgCyan };
+	pub var AtrCellBar: term.ZONATRB = .{ .styled = [_]u32{
+		@intFromEnum(term.Style.styleReverse),
+		@intFromEnum(term.Style.styleItalic),
+		@intFromEnum(term.Style.notStyle),
+		@intFromEnum(term.Style.notStyle) },
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgCyan };
 
 	// use default Style separator
 	pub var gridStyle: []const u8 = "│";
 
 	pub var gridnoStyle: []const u8 = " ";
 
-	pub const CELL = struct { text: []const u8, long: usize, reftyp: REFTYP, posy: usize, edtcar: []const u8, atrCell: term.ZONATRB };
+	pub const CELL = struct { text: []const u8,
+		long: usize,
+		reftyp: REFTYP,
+		posy: usize,
+		edtcar: []const u8,
+		atrCell: term.ZONATRB };
 
 	const ArgData = struct {
 		buf: std.ArrayList([]const u8) = std.ArrayList([]const u8).init(allocatorArgData),
 	};
 
 	/// define GRID
-	pub const GRID = struct { name: []const u8, posx: usize, posy: usize, lines: usize, cols: usize, pageRows: usize, data: std.MultiArrayList(ArgData), cell: std.ArrayList(CELL), headers: std.ArrayList(CELL), separator: []const u8, attribut: term.ZONATRB, atrTitle: term.ZONATRB, atrCell: term.ZONATRB, cadre: CADRE, actif: bool, lignes: usize, pages: usize, maxligne: usize, cursligne: usize, curspage: usize, buf: std.ArrayList(TERMINAL_CHAR) };
+	pub const GRID = struct { name: []const u8,
+		posx: usize,
+		posy: usize,
+		lines: usize,
+		cols: usize,
+		pageRows: usize,
+		data: std.MultiArrayList(ArgData),
+		cell: std.ArrayList(CELL),
+		headers: std.ArrayList(CELL),
+		separator: []const u8,
+		attribut: term.ZONATRB,
+		atrTitle: term.ZONATRB,
+		atrCell: term.ZONATRB,
+		cadre: CADRE,
+		actif: bool,
+		lignes: usize,
+		pages: usize,
+		maxligne: usize,
+		cursligne: usize,
+		curspage: usize,
+		buf: std.ArrayList(TERMINAL_CHAR) };
 
 	/// concat String
 	fn concatStr(a: []const u8, b: []const u8) []const u8 {
@@ -179,12 +228,14 @@ pub const grd = struct {
 			if (cell.reftyp == REFTYP.DIGIT or cell.reftyp == REFTYP.DECIMAL) {
 				e_FIELD = subStrGrid(e_FIELD, 1, e_FIELD.len);
 
-				if (utl.isSignedStr(text) == false) e_FIELD = concatStr("+", e_FIELD) else e_FIELD = concatStr(e_signed, e_FIELD);
+				if (utl.isSignedStr(text) == false) e_FIELD = concatStr("+", e_FIELD)
+				else e_FIELD = concatStr(e_signed, e_FIELD);
 			}
 		} else e_FIELD = utl.alignStr(e_FIELD, utl.ALIGNS.left, cell.long);
 
 		if (cell.reftyp == REFTYP.SWITCH) {
-			if (std.mem.eql(u8, text[0..], "true") or std.mem.eql(u8, text[0..], "1")) e_FIELD = CTRUE else e_FIELD = CFALSE;
+			if (std.mem.eql(u8, text[0..], "true") or std.mem.eql(u8, text[0..], "1")) e_FIELD = CTRUE
+			else e_FIELD = CFALSE;
 		}
 
 		if (std.mem.eql(u8, cell.edtcar, "") == false) e_FIELD = concatStr(e_FIELD, cell.edtcar);
@@ -351,11 +402,15 @@ pub const grd = struct {
 	}
 
 	// New	CELL	--> arraylist panel-grid
-	pub fn newCell(self: *GRID, vtext: []const u8, vlong: usize, vreftyp: REFTYP, TextColor: term.ForegroundColor) void {
+	pub fn newCell(self: *GRID, vtext: []const u8, vlong: usize, vreftyp: REFTYP, TextColor: term.ForegroundColor)
+	void {
+
 		var nlong: usize = 0;
 		if (utl.nbrCharStr(vtext) > vlong) nlong = utl.nbrCharStr(vtext) else nlong = vlong;
 
-		const cell = CELL{ .text = vtext, .reftyp = vreftyp, .long = nlong, .posy = 0, .edtcar = "", .atrCell = toRefColor(TextColor) };
+		const cell = CELL{
+			.text = vtext, .reftyp = vreftyp, .long = nlong, .posy = 0, .edtcar = "",
+			.atrCell = toRefColor(TextColor) };
 
 		self.cell.append(cell) catch |err| {
 			@panic(@errorName(err));
@@ -563,18 +618,20 @@ pub const grd = struct {
 
 		for (self.headers.items, 0..) |_, idx| {
 			self.headers.items[idx].posy = pos;
-			if (self.headers.items[idx].edtcar.len == 0) pos = pos + self.headers.items[idx].long + 1 else pos = pos + self.headers.items[idx].long + 1 + 1;
+			if (self.headers.items[idx].edtcar.len == 0) pos = pos + self.headers.items[idx].long + 1
+			else pos = pos + self.headers.items[idx].long + 1 + 1;
 		}
 
 		for (self.headers.items) |cellx| {
 			if (std.mem.eql(u8, cellx.edtcar, "") == true)
-				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}", .{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long) }) catch |err| {
-					@panic(@errorName(err));
+				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}",
+					.{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long) })
+					catch |err| {@panic(@errorName(err));
 				}
 			else
-				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}{s}", .{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long), Blanc }) catch |err| {
-					@panic(@errorName(err));
-				};
+				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}{s}",
+					.{ buf, self.separator, utl.alignStr(" ", utl.ALIGNS.left, cellx.long), Blanc })
+					catch |err| {@panic(@errorName(err));};
 		}
 		buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}", .{ buf, self.separator }) catch |err| {
 			@panic(@errorName(err));
@@ -603,16 +660,18 @@ pub const grd = struct {
 				cellx.reftyp == REFTYP.DIGIT or
 				cellx.reftyp == REFTYP.UDECIMAL or
 				cellx.reftyp == REFTYP.DECIMAL)
-				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}", .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.rigth, cellx.long) }) catch |err| {
-					@panic(@errorName(err));
+				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}",
+					.{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.rigth, cellx.long) })
+					catch |err| {@panic(@errorName(err));
 				}
 			else
-				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}", .{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.left, cellx.long) }) catch |err| {
-					@panic(@errorName(err));
+				buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}{s}", 
+					.{ buf, self.separator, utl.alignStr(cellx.text, utl.ALIGNS.left, cellx.long) })
+					catch |err| {@panic(@errorName(err));
 				};
 
-			if (std.mem.eql(u8, cellx.edtcar, "") == false) buf = std.fmt.allocPrint(allocatorGrid, "{s}{s}", .{ buf, Blanc }) catch |err| {
-				@panic(@errorName(err));
+			if (std.mem.eql(u8, cellx.edtcar, "") == false) buf =std.fmt.allocPrint(allocatorGrid, "{s}{s}",
+				.{ buf, Blanc }) catch |err| {@panic(@errorName(err));
 			};
 
 			n = getLenHeaders(self);
@@ -677,7 +736,8 @@ pub const grd = struct {
 					n = nposy + self.headers.items[h].posy;
 					while (iter.next()) |ch| : (n += 1) {
 						self.buf.items[n].ch = std.fmt.allocPrint(allocatorGrid, "{s}", .{ch}) catch unreachable;
-						if (self.cursligne == l or self.cursligne == r) self.buf.items[n].attribut = AtrCellBar else self.buf.items[n].attribut = self.headers.items[h].atrCell;
+						if (self.cursligne == l or self.cursligne == r) self.buf.items[n].attribut = AtrCellBar
+						else self.buf.items[n].attribut = self.headers.items[h].atrCell;
 						self.buf.items[n].on = true;
 					}
 				}
@@ -986,8 +1046,10 @@ pub const grd = struct {
 				n += 1;
 			}
 			if (self.curspage > 1) {
-				if (((self.pageRows - 1) * (self.curspage - 1)) < pos) CountLigne = 0 else CountLigne = ((self.pageRows - 1) * (self.curspage - 1)) - pos;
-			} else CountLigne = pos;
+				if (((self.pageRows - 1) * (self.curspage - 1)) < pos) CountLigne = 0 
+				else CountLigne = ((self.pageRows - 1) * (self.curspage - 1)) - pos;
+			}
+			CountLigne = pos;
 		}
 
 		term.cursHide();
@@ -1053,6 +1115,7 @@ pub const grd = struct {
 				.up => if (CountLigne > 0) {
 					CountLigne -= 1;
 					self.cursligne -= 1;
+
 				},
 
 				.down => if (CountLigne < self.maxligne) {
