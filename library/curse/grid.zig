@@ -131,10 +131,11 @@ pub const grd = struct {
 
 	// use default Style separator
 	pub var gridStyle: []const u8 = "│";
-
+	pub var gridStyle2: []const u8 = "║";
 	pub var gridnoStyle: []const u8 = " ";
 
-	pub const CELL = struct { text: []const u8,
+	pub const CELL = struct {
+		text: []const u8,
 		long: usize,
 		reftyp: REFTYP,
 		posy: usize,
@@ -146,7 +147,8 @@ pub const grd = struct {
 	};
 
 	/// define GRID
-	pub const GRID = struct { name: []const u8,
+	pub const GRID = struct {
+		name: []const u8,
 		posx: usize,
 		posy: usize,
 		lines: usize,
@@ -246,7 +248,7 @@ pub const grd = struct {
 	// calculate the number of pages
 	pub fn setPageGrid(self: *GRID) void {
 		self.lignes = self.data.len;
-		if (self.lignes < self.pageRows) self.pages = 1 else {
+		if (self.lignes < self.pageRows ) self.pages = 1 else {
 			self.pages = self.lignes / (self.pageRows - 1);
 			if (@rem(self.lignes, (self.pageRows - 1)) > 0) self.pages += 1;
 		}
@@ -254,6 +256,42 @@ pub const grd = struct {
 
 	// new GRID object
 	// Works like a panel with grid behavior
+	pub fn initGrid(
+		vname: []const u8,
+		vposx: usize,
+		vposy: usize,
+		vpageRows: usize, // nbr ligne	+ header
+		vseparator: []const u8,
+		vcadre: CADRE,
+	) GRID {
+		const device = GRID{
+		.name = vname,
+		.posx = vposx,
+		.posy = vposy,
+		.lines = vpageRows + 2, //	row per page	+ cadre
+		.cols  = 0,
+		.separator = vseparator,
+		.pageRows  = vpageRows,
+		.data    = std.MultiArrayList(ArgData){},
+		.headers = std.ArrayList(CELL).init(allocatorGrid),
+		.cell    = std.ArrayList(CELL).init(allocatorGrid),
+		.actif   = true,
+		.attribut = AtrGrid,
+		.atrTitle = AtrTitle,
+		.atrCell  = AtrCell,
+		.cadre  = vcadre,
+		.lignes = 0,
+		.pages  = 0,
+		.maxligne  = 0,
+		.cursligne = 0,
+		.curspage  = 1,
+
+		.buf = std.ArrayList(TERMINAL_CHAR).init(allocatorGrid)
+		};
+
+		return device;
+	}
+
 	pub fn newGridC(
 		vname: []const u8,
 		vposx: usize,
@@ -270,22 +308,22 @@ pub const grd = struct {
 		device.posx = vposx;
 		device.posy = vposy;
 		device.lines = vpageRows + 2; //	row per page	+ cadre
-		device.cols = 0;
+		device.cols  = 0;
 		device.separator = vseparator;
-		device.pageRows = vpageRows;
-		device.data = std.MultiArrayList(ArgData){};
+		device.pageRows  = vpageRows;
+		device.data    = std.MultiArrayList(ArgData){};
 		device.headers = std.ArrayList(CELL).init(allocatorGrid);
-		device.cell = std.ArrayList(CELL).init(allocatorGrid);
-		device.actif = true;
+		device.cell    = std.ArrayList(CELL).init(allocatorGrid);
+		device.actif   = true;
 		device.attribut = AtrGrid;
 		device.atrTitle = AtrTitle;
-		device.atrCell = AtrCell;
-		device.cadre = vcadre;
+		device.atrCell  = AtrCell;
+		device.cadre  = vcadre;
 		device.lignes = 0;
-		device.pages = 0;
-		device.maxligne = 0;
+		device.pages  = 0;
+		device.maxligne  = 0;
 		device.cursligne = 0;
-		device.curspage = 1;
+		device.curspage  = 1;
 
 		device.buf = std.ArrayList(TERMINAL_CHAR).init(allocatorGrid);
 
@@ -409,7 +447,7 @@ pub const grd = struct {
 		if (utl.nbrCharStr(vtext) > vlong) nlong = utl.nbrCharStr(vtext) else nlong = vlong;
 
 		const cell = CELL{
-			.text = vtext, .reftyp = vreftyp, .long = nlong, .posy = 0, .edtcar = "",
+			.text = vtext, .reftyp = vreftyp, .long = nlong, .posy = self.cell.items.len, .edtcar = "",
 			.atrCell = toRefColor(TextColor) };
 
 		self.cell.append(cell) catch |err| {

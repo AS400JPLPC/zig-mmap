@@ -9,24 +9,24 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
 
 	const logger_mod = b.addModule("logger", .{
-		.root_source_file = .{ .path = "./curse/logger.zig" },
+		.root_source_file =  b.path( "./curse/logger.zig" ),
 	});
 
 
 	const cursed_mod = b.addModule("cursed", .{
-		.root_source_file = .{ .path = "./curse/cursed.zig" },
+		.root_source_file = b.path( "./curse/cursed.zig" ),
 	});
 
 	const utils_mod = b.addModule("utils", .{
-		.root_source_file = .{ .path = "./curse/utils.zig" },
+		.root_source_file = b.path( "./curse/utils.zig" ),
 	});
 
 	const match_mod = b.addModule("match", .{
-		.root_source_file = .{ .path = "./curse/match.zig" },
+		.root_source_file = b.path( "./curse/match.zig" ),
 	});
 
  	const forms_mod = b.addModule("forms", .{
-		.root_source_file = .{ .path = "./curse/forms.zig" },
+		.root_source_file = b.path( "./curse/forms.zig" ),
 		.imports= &.{
 		.{ .name = "cursed", .module = cursed_mod },
 		.{ .name = "utils",  .module = utils_mod},
@@ -35,7 +35,7 @@ pub fn build(b: *std.Build) void {
 	});
 
 	const grid_mod = b.addModule("grid", .{
-		.root_source_file = .{ .path = "./curse/grid.zig" },
+		.root_source_file = b.path( "./curse/grid.zig" ),
 		.imports = &.{
 		.{ .name = "cursed", .module = cursed_mod},
 		.{ .name = "utils",  .module = utils_mod},
@@ -43,7 +43,7 @@ pub fn build(b: *std.Build) void {
 	});
 
 	const menu_mod= b.addModule("menu", .{
-		.root_source_file = .{ .path = "./curse/menu.zig" },
+		.root_source_file = b.path( "./curse/menu.zig" ),
 		.imports= &.{
 		.{ .name = "cursed", .module = cursed_mod},
 		.{ .name = "utils",  .module = utils_mod},
@@ -53,19 +53,19 @@ pub fn build(b: *std.Build) void {
 
 
 	const callpgm_mod = b.addModule("callpgm", .{
-		.root_source_file = .{ .path = "./calling/callpgm.zig" },
+		.root_source_file = b.path( "./calling/callpgm.zig" ),
 	});
 
 
 
 	const crypto_mod= b.addModule("crypto", .{
-		.root_source_file = .{ .path = "./crypt/crypto.zig" },
+		.root_source_file = b.path( "./crypt/crypto.zig" ),
 	});
 
 
 
 	const zmmap_mod= b.addModule("zmmap", .{
-		.root_source_file = .{ .path = "./mmap/zmmap.zig" },
+		.root_source_file = b.path( "./mmap/zmmap.zig" ),
 		.imports= &.{
 		.{ .name = "crypto", .module = crypto_mod},
 		.{ .name = "logger", .module = logger_mod},
@@ -74,7 +74,7 @@ pub fn build(b: *std.Build) void {
 
 
 	const decimal_mod = b.addModule("decimal", .{
-		.root_source_file = .{ .path = "./decimal/decimal.zig" },
+		.root_source_file = b.path( "./decimal/decimal.zig" ),
 	});
 
 
@@ -83,18 +83,18 @@ pub fn build(b: *std.Build) void {
 
 
 
-	match_mod.addIncludePath(.{.path = "./lib/"});
+	match_mod.addIncludePath( b.path( "./lib/"));
 	match_mod.link_libc = true;
 	match_mod.addObjectFile(.{.cwd_relative = "/usr/lib/libpcre2-posix.so"});
 
-	decimal_mod.addIncludePath(.{.path = "./lib/"});
+	decimal_mod.addIncludePath( b.path( "./lib/"));
 	decimal_mod.link_libc = true;
 	decimal_mod.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
 
 
 	
 	const library_mod = b.addModule("library", .{
-		.root_source_file = .{ .path = "library.zig" },
+		.root_source_file = b.path( "library.zig" ),
 		.imports = &.{
 		.{ .name = "cursed",	.module = cursed_mod },
 		.{ .name = "utils",		.module = utils_mod },

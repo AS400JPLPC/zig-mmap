@@ -196,4 +196,9 @@ This process appears to be an organized way of managing interactions between dif
 &nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version    0.12.0-dev.3429+13a9d94a8<BR /> 
 
 *   •2024-03-25.<BR /> 
-&nbsp;&nbsp;&nbsp;&larr;&nbsp; test  Pcall&nbsp;&nbsp;&nbsp;Pmaitre
+&nbsp;&nbsp;&nbsp;&larr;&nbsp; test  Pcall&nbsp;&nbsp;&nbsp;Pmaitre<BR /> 
+
+
+*   •upgrade  2024-05-29.<BR />
+&nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version    0.13.0<BR /> 
+
