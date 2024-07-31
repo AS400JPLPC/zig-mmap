@@ -54,7 +54,7 @@ const mnu = @import("menu").mnu;
 const utl = @import("utils");
 
 // tools regex
-const reg = @import("match");
+const reg = @import("mvzr");
 
 
 
@@ -191,7 +191,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										true,						// tofill
 										"required",					// error msg
 										"please enter text Alpha crtl+p call Exemple",	// help
-										"^[a-zA-Z]{1,}$",			// regex
+										"^[a-z]{1,1}[a-zA-Z]{0,}$",	// regex
 										)
 	) catch unreachable ;
 	
@@ -212,7 +212,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										true,								// tofill
 										"required",							// error msg
 										"please enter text Alpha Numéric",	// help
-										"^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}",	// regex
+										"^[a-zA-Z]{1,1}[a-zA-Z0-9]{0,}$",	// regex
 										)
 	) catch unreachable ;
 
@@ -222,7 +222,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										true,								// tofill
 										"required",							// error msg
 										"please enter text Alpha Numéric",	// help
-										"^[A-Z]{1,1}[A-Z0-9]{0,}",			// regex
+										"^[A-Z]{1,1}[A-Z0-9]{0,}$",			// regex
 										)
 	) catch unreachable ;
 
@@ -315,8 +315,8 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										"+(001)451 452 453 545",	// text
 										true,						// tofill
 										"required or invalide",		// error msg
-										"ex:+(001)456.123.789",		 // help
-			 "^[+]{1,1}[(]([0-9]{3,3})[)]([-. ]?[0-9]{3}){2,4}$",	// regex US default standard
+										"ex:+(001)456.123.789",		// help
+				 "[+][(][0-9]{3}[)][0-9]{3}([-. ]?[0-9]{3}){1,4}",	// regex US default standard
 										)
 	) catch unreachable ;
 
@@ -326,7 +326,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 										false,								// tofill
 										"required or invalide",				 // error msg
 										"ex:+(33)6.12.34.56.78",			// help
-"^[+]{1,1}[(]{0,1}[0-9]{1,3}[)]([0-9]{1,3}){1,1}([-. ]?[0-9]{2,3}){2,4}$"	// regex default standard fr
+						"[+][(][0-9]{2,3}[)][0-9]([-. ]?[0-9]{2,3}){1,4}"	// regex default standard fr
 										)
 	) catch unreachable ;
 	
@@ -825,6 +825,8 @@ pub fn main() !void {
 				grd.addRows(Grid01 , &.{"11", "Bleu11", "poisson","100.00","0","tictac"});
 				grd.addRows(Grid01 , &.{"12", "Bleu12", "Canard","100,00","0","tictac"});
 
+
+
 				//grd.dltRows(&Grid01 , 5) catch |err| {dsperr.errorForms(err); return;};
 				while (true ){
 					Gkey =grd.ioGrid(Grid01,true);
@@ -916,7 +918,6 @@ if (nParm == 2 ) {
 	LDA.reply = true;
 	UDS.zua1  = "j'ai bien reçu votre message";
 	UDS.zua3  = "Jean-Pierre";
-	UDS.zua   = "Jean-Pierre";
 	UDS.zun5  = "0";
 	UDS.zu8   = 50;
 	UDS.zcomit = true;

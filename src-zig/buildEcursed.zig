@@ -23,7 +23,7 @@ pub fn build(b: *std.Build) void {
 	
 	const Prog = b.addExecutable(.{
 	.name = "Ecursed",
-	.root_source_file = .{ .path = "./Ecursed.zig" },
+	.root_source_file = b.path( "./Ecursed.zig" ),
 	.target = target,
 	.optimize = optimize,
 	});
@@ -37,7 +37,7 @@ pub fn build(b: *std.Build) void {
 	// Import the smaller 'cursed' and 'utils' modules exported by the library. etc...
 	Prog.root_module.addImport("cursed", library_dep.module("cursed"));
 	Prog.root_module.addImport("utils", library_dep.module("utils"));
-    Prog.root_module.addImport("match", library_dep.module("match"));
+    Prog.root_module.addImport("mvzr", library_dep.module("mvzr"));
     Prog.root_module.addImport("forms", library_dep.module("forms"));
     Prog.root_module.addImport("grid",  library_dep.module("grid"));
     Prog.root_module.addImport("menu", library_dep.module("menu"));

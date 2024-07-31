@@ -41,32 +41,129 @@ pub const mnu = struct {
 
 	pub const MNUVH = enum { vertical, horizontal };
 	// nbr espace intercaler
-	pub var mnuspc: usize = 3;
+	pub var mnuspc: usize = 1;
 
 	// define attribut default CADRE
-	pub var AtrMnu: term.ZONATRB = .{ .styled = [_]u32{ @intFromEnum(term.Style.styleDim), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) }, .backgr = term.BackgroundColor.bgBlack, .foregr = term.ForegroundColor.fgRed };
+	pub var AtrMnu: term.ZONATRB = .{
+		.styled = [_]u32{
+			@intFromEnum(term.Style.styleDim),
+			@intFromEnum(term.Style.notStyle),
+			@intFromEnum(term.Style.notStyle),
+			@intFromEnum(term.Style.notStyle)
+		},
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgRed
+	};
 
-	pub var AtrBar: term.ZONATRB = .{ .styled = [_]u32{ @intFromEnum(term.Style.styleReverse), @intFromEnum(term.Style.styleItalic), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) }, .backgr = term.BackgroundColor.bgBlack, .foregr = term.ForegroundColor.fgWhite };
+	pub var AtrBar: term.ZONATRB = .{
+		.styled = [_]u32{
+			@intFromEnum(term.Style.styleReverse),
+			@intFromEnum(term.Style.styleItalic),
+			@intFromEnum(term.Style.notStyle),
+			@intFromEnum(term.Style.notStyle)
+		},
+		.backgr = term.BackgroundColor.bgBlack,
+		.foregr = term.ForegroundColor.fgWhite
+	 };
 
 	pub var AtrCell: term.ZONATRB = .{
-		.styled = [_]u32{ @intFromEnum(term.Style.styleItalic), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle), @intFromEnum(term.Style.notStyle) },
+		.styled = [_]u32{
+			@intFromEnum(term.Style.styleItalic),
+			@intFromEnum(term.Style.notStyle),
+			@intFromEnum(term.Style.notStyle),
+			@intFromEnum(term.Style.notStyle)
+		},
 		.backgr = term.BackgroundColor.bgBlack,
 		.foregr = term.ForegroundColor.fgWhite,
 	};
 
+
+	//------------------------------------------
+	// def management JSON
+	pub const Emenu = enum {
+		name,
+		posx,
+		posy,
+		cadre,
+		mnuvh,
+		xitems
+	};
+	pub const Eopt = enum {
+		text,
+	};	
+	
+	//------------------------------------------
+	
+	// define MENU itemm ALL
+	pub const DEFMENU = struct {
+		 name:  []const u8,
+		 posx:  usize,
+		 posy:  usize,
+		 cadre: CADRE,
+		 mnuvh: MNUVH,
+		 xitems: [][]const u8,
+	};
+	
 	// define MENU
-	pub const MENU = struct { name: []const u8, posx: usize, posy: usize, lines: usize, cols: usize, cadre: CADRE, mnuvh: MNUVH, attribut: term.ZONATRB, attrBar: term.ZONATRB, attrCell: term.ZONATRB, xitems: []const []const u8, nbr: usize, actif: bool };
+	pub const MENU = struct {
+		 name:  []const u8,
+		 posx:  usize,
+		 posy:  usize,
+		 lines: usize,
+		 cols:  usize,
+		 cadre: CADRE,
+		 mnuvh: MNUVH,
+		 attribut: term.ZONATRB,
+		 attrBar:  term.ZONATRB,
+		 attrCell: term.ZONATRB,
+		 xitems: []const []const u8,
+		 nbr: usize,
+		 actif: bool
+	};
 
 	// NEW MENU
-	pub fn newMenu(vname: []const u8, vposx: usize, vposy: usize, vcadre: CADRE, vmnuvh: MNUVH, vitems: []const []const u8) MENU {
-		var xmenu = MENU{ .name = vname, .posx = vposx, .posy = vposy, .lines = 0, .cols = 0, .cadre = vcadre, .mnuvh = vmnuvh, .attribut = AtrMnu, .attrBar = AtrBar, .attrCell = AtrCell, .xitems = vitems, .nbr = 0, .actif = true };
-
-		for (xmenu.xitems) |txt| {
-			if (xmenu.cols < txt.len) xmenu.cols = txt.len;
-			xmenu.nbr += 1;
-		}
-		xmenu.lines += xmenu.nbr + 2; //nbr ligne	+ header =cadre
-		xmenu.cols += 2;
+	pub fn newMenu(vname: []const u8, vposx: usize, vposy: usize, vcadre: CADRE,
+									 vmnuvh: MNUVH, vitems: []const []const u8) MENU {
+		
+		var xmenu = MENU{
+			.name = vname,
+			.posx = vposx,
+			.posy = vposy,
+			.lines = 0,
+			.cols  = 0,
+			.cadre = vcadre,
+			.mnuvh = vmnuvh,
+			.attribut = AtrMnu,
+			.attrBar  = AtrBar,
+			.attrCell = AtrCell,
+			.xitems = vitems,
+			.nbr = 0,
+			.actif = false
+			};
+			if (xmenu.mnuvh == MNUVH.vertical) {
+				for (xmenu.xitems) |txt| {
+					if (txt.len > 0) {
+						if (xmenu.cols < txt.len) xmenu.cols = txt.len;
+						xmenu.nbr += 1;
+						xmenu.actif = true;
+					}
+				}
+				xmenu.lines += xmenu.nbr + 2; //nbr ligne	+ header =cadre
+				xmenu.cols += 2;
+			}			
+			if (xmenu.mnuvh == MNUVH.horizontal) {
+				for (xmenu.xitems) |txt| {
+					if (txt.len > 0) {
+						if (xmenu.cols < txt.len) xmenu.cols = txt.len;
+						xmenu.cols += utl.nbrCharStr(txt) + mnuspc;
+						xmenu.nbr += 1;
+						xmenu.actif = true;
+					}
+				}
+				xmenu.lines = 3 ;
+				xmenu.cols -= mnuspc;
+				xmenu.cols += 1;
+			}
 		return xmenu;
 	}
 
@@ -136,7 +233,7 @@ pub const mnu = struct {
 		var row: usize = 1;
 		var y: usize = 0;
 		var col: usize = 0;
-
+				
 		var x: usize = vmnu.posx;
 
 		// if line 0 ex: directory tab
@@ -193,10 +290,13 @@ pub const mnu = struct {
 						}
 					}
 					if (edt) {
-						term.gotoXY(row + vmnu.posx, col + vmnu.posy);
+
+						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx, col + vmnu.posy)
+						else term.gotoXY(row  + vmnu.posx, col + vmnu.posy);
 						term.writeStyled(trait, vmnu.attribut);
 					} else {
-						term.gotoXY(row + vmnu.posx, col + vmnu.posy);
+						if (vmnu.mnuvh == MNUVH.vertical) term.gotoXY(row + vmnu.posx, col + vmnu.posy)
+						else term.gotoXY(row  + vmnu.posx, col + vmnu.posy);
 						term.writeStyled(" ", vmnu.attribut);
 					}
 
@@ -217,6 +317,7 @@ pub const mnu = struct {
 		const x: usize = vmnu.posx + 1;
 		const y: usize = vmnu.posy + 1;
 
+		if ( !vmnu.actif) return;
 		printMenu(vmnu);
 
 		term.onMouse();
@@ -227,27 +328,29 @@ pub const mnu = struct {
 		n = 0;
 		h = 0;
 		for (vmnu.xitems) |cell| {
-			if (vmnu.mnuvh == MNUVH.vertical) {
-				if (vmnu.cadre == CADRE.line0)
-					term.gotoXY(x + n, y)
+			if (cell.len  > 0 ) {
+				if (vmnu.mnuvh == MNUVH.vertical) {
+					if (vmnu.cadre == CADRE.line0)
+						term.gotoXY(x + n, y)
+					else
+						term.gotoXY(x + n + 1, y + 1);
+				}
+				if (vmnu.mnuvh == MNUVH.horizontal) {
+					if (vmnu.cadre == CADRE.line0)
+						term.gotoXY(x, h + y)
+					else
+						term.gotoXY(x + 1, h + y + 1);
+				}
+				//var xcell = utl.Trim(cell);
+				if (pos == n)
+					term.writeStyled(cell, vmnu.attrBar)
 				else
-					term.gotoXY(x + n + 1, y + 1);
-			}
-			if (vmnu.mnuvh == MNUVH.horizontal) {
-				if (vmnu.cadre == CADRE.line0)
-					term.gotoXY(x, h + y)
-				else
-					term.gotoXY(x + 1, h + y + 1);
-			}
-			//var xcell = utl.Trim(cell);
-			if (pos == n)
-				term.writeStyled(cell, vmnu.attrBar)
-			else
-				term.writeStyled(cell, vmnu.attrCell);
+					term.writeStyled(cell, vmnu.attrCell);
 
-			n += 1;
-			h += utl.nbrCharStr(cell);
-			if (vmnu.mnuvh == MNUVH.horizontal) h += mnuspc;
+				n += 1;
+				h += utl.nbrCharStr(cell);
+				if (vmnu.mnuvh == MNUVH.horizontal) h += mnuspc;
+			}
 		}
 	}
 

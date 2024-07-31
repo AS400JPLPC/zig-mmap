@@ -118,36 +118,35 @@ var nParm : usize = 0;
 fn getPgmArgs() void {
 	var args_it = try std.process.ArgIterator.initWithAllocator(allocUDS);
 	defer args_it.deinit();
-	while(args_it.next()) |arg|  {
+		while(args_it.next()) |arg|  {
 		nParm += 1;
-		std.debug.print("\n{d}\n",.{nParm}); std.debug.print("\n{s}\n",.{arg});
+			plog(.Panel).warn("\n{d}\n",.{nParm}); plog(.Panel).warn("\n{s}\n",.{arg});
 		if(nParm == 1) pgmName = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
 		if(nParm == 2) pgmPARM = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
 	} 
 }
 pub fn main() !void {
 	deb_Log("Pecho.txt");
-	plog(.main).debug("Begin\n", .{});
+	plog(.main).warn("Begin\n", .{});
 
-	
 	getPgmArgs();
-	plog(.Panel).debug("nParm {d}\n",.{nParm});
+	plog(.Panel).warn("nParm {d}\n",.{nParm});
 	
 	var UDS : COMUDS =initUDS();
 if (nParm == 2 ) {
-	plog(.Panel).debug("echoMmap\n",.{});
+	plog(.Panel).warn("echoMmap\n",.{});
 	var LDA = map.echoMmap(pgmPARM) 
 				catch  @panic(" error readMmap  not init communication call service informatique");
 	
-	plog(.Panel).debug("readLDA\n",.{});
+	plog(.Panel).warn("readLDA\n",.{});
 	LDA = map.readLDA();
 	
 	UDS = ldaToUDS(LDA);
-plog(.Panel).debug("\nldaToUDS(",.{});
-plog(.Panel).debug("{d}",.{nParm});
-plog(.Panel).debug("{s}",.{LDA.zuds});
-plog(.Panel).debug("{}",.{LDA.reply});
-plog(.Panel).debug("{}",.{LDA.abort});
+plog(.Panel).warn("\nldaToUDS(",.{});
+plog(.Panel).warn("{d}",.{nParm});
+plog(.Panel).warn("{s}",.{LDA.zuds});
+plog(.Panel).warn("{}",.{LDA.reply});
+plog(.Panel).warn("{}",.{LDA.abort});
 		// work traitement:
 		// end traitement
 		LDA.echo = pgmName;
@@ -158,12 +157,12 @@ plog(.Panel).debug("{}",.{LDA.abort});
 		// send group datarea
 		udsToLDA(UDS, &LDA);
 
-plog(.Panel).debug("\nudsToLDA",.{});
-plog(.Panel).debug("{s}",.{LDA.zuds});
-plog(.Panel).debug("{}",.{LDA.reply});
-plog(.Panel).debug("{}",.{LDA.abort});
+plog(.Panel).warn("\nudsToLDA",.{});
+plog(.Panel).warn("{s}",.{LDA.zuds});
+plog(.Panel).warn("{}",.{LDA.reply});
+plog(.Panel).warn("{}",.{LDA.abort});
 
-plog(.Panel).debug("writeLDA\n",.{});
+plog(.Panel).warn("writeLDA\n",.{});
 		map.writeLDA(&LDA);
 		//defer allocator.free(pgmPARM);
 

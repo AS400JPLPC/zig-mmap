@@ -24,7 +24,7 @@ pub fn build(b: *std.Build) void {
 	
 	const Prog = b.addExecutable(.{
 	.name = "Pcall",
-	.root_source_file = .{ .path = "./Pcall.zig" },
+	.root_source_file =  b.path( "./Pcall.zig" ),
 	.target = target,
 	.optimize = optimize,
 	});

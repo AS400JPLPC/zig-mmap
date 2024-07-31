@@ -129,7 +129,7 @@ fn getPgmArgs() void {
 		// std.debug.print("\n{d}",.{nParm}); std.debug.print("{s}",.{arg});
 		if(nParm == 1) pgmName = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
 		if(nParm == 2) pgmPARM = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
-	} 
+	}
 }
 
 //============================================================================================
@@ -178,6 +178,7 @@ pub fn main() !void {
 	if (LDA.reply == true) {
 		try	w.print("\n LDA.user  {s}", .{LDA.user});
 		try	w.print("\n LDA.Init  {s}", .{LDA.init});
+
 		try	w.print("\n LDA.Echo  {s}", .{LDA.echo});
 		try	w.print("\n LDA.reply {}",  .{LDA.reply});
 		try	w.print("\n LDA.abort {}",  .{LDA.abort});
