@@ -478,8 +478,8 @@ pub fn disableRawMode() void {
 const TermSize = struct { width: usize, height: usize };
 
 pub fn getSize() TermSize {
-    var win_size: std.os.linux.winsize = undefined;
-    // var win_size: std.posix.winsize = undefined;
+    // var win_size: std.os.linux.winsize = undefined;
+     var win_size: std.posix.winsize = undefined;
 
     const err = os.linux.ioctl(TTY.handle, os.linux.T.IOCGWINSZ, @intFromPtr(&win_size));
     if (std.posix.errno(err) != .SUCCESS) {
@@ -488,10 +488,10 @@ pub fn getSize() TermSize {
 
     
     return TermSize{
-        .height = win_size.ws_row, 
-        .width = win_size.ws_col, 
-        // .height = win_size.row,
-        // .width = win_size.col,       
+        // .height = win_size.ws_row, 
+        // .width = win_size.ws_col, 
+        .height = win_size.row,
+        .width = win_size.col,       
         };
 }
 
