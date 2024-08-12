@@ -1,7 +1,10 @@
 const std = @import("std");
-const dds = @import("dds");
+// const dds = @import("dds");
 // keyboard
 const kbd = @import("cursed").kbd;
+
+// forms
+const forms = @import("forms");
 
 // tools utility
 const utl = @import("utils");
@@ -73,7 +76,7 @@ const RPANEL = struct {
     lines:  usize,
     cols:   usize,
 
-    cadre:  dds.CADRE,
+    cadre:  forms.CADRE,
 
     title:  []const u8 ,
 
@@ -320,7 +323,7 @@ pub fn jsonDecode(my_json : []const u8) !void {
               
               if ( try val.ctrlPack(Ctype.string) ) {
                 
-                ENRG.cadre = strToEnum(dds.CADRE, val.x.?.string);
+                ENRG.cadre = strToEnum(forms.CADRE, val.x.?.string);
               }
               else 
                 @panic(try std.fmt.allocPrint(allocator,"Json  err_Field :{s}\n", .{ 

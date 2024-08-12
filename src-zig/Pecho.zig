@@ -8,8 +8,6 @@ const map = @import("zmmap");
 
 
 
-const deb_Log = @import("logger").openFile;   // open  file
-const end_Log = @import("logger").closeFile;  // close file
 const plog	  = @import("logger").scoped;      // print file 
 
 //============================================================================================
@@ -126,7 +124,7 @@ fn getPgmArgs() void {
 	} 
 }
 pub fn main() !void {
-	deb_Log("Pecho.txt");
+	// deb_Log("Pecho.txt");
 	plog(.main).warn("Begin\n", .{});
 
 	getPgmArgs();
@@ -166,7 +164,7 @@ plog(.Panel).warn("writeLDA\n",.{});
 		map.writeLDA(&LDA);
 		//defer allocator.free(pgmPARM);
 
-end_Log();
+// end_Log();
 
 
 	} else {

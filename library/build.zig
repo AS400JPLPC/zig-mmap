@@ -1,6 +1,5 @@
 	///-----------------------
 	/// build (library)
-	/// zig 0.12.0 dev
 	///-----------------------
 
 const std = @import("std");
@@ -9,9 +8,11 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
 
 	const logger_mod = b.addModule("logger", .{
-		.root_source_file =  b.path( "./curse/logger.zig" ),
+		.root_source_file =  b.path( "./log/logger.zig" ),
 	});
-
+	const logcons_mod = b.addModule("logcons", .{
+		.root_source_file =  b.path( "./log/logcons.zig" ),
+	});
 
 	const cursed_mod = b.addModule("cursed", .{
 		.root_source_file = b.path( "./curse/cursed.zig" ),
@@ -102,9 +103,10 @@ pub fn build(b: *std.Build) void {
 		
 		.{ .name = "callpgm",	.module = callpgm_mod },
 		.{ .name = "zmmap",		.module = zmmap_mod },
-		.{ .name = "crypto",	.module = crypto_mod },
+		.{ .name = "crypto",		.module = crypto_mod },
 		
 		.{ .name = "logger",	.module = logger_mod },
+		.{ .name = "logcons",	.module = logcons_mod },
 			
 		},
 	});
