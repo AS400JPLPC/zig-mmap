@@ -12,10 +12,10 @@ pub fn build(b: *std.Build) void {
 	const target   = b.standardTargetOptions(.{});
 	const optimize = b.standardOptimizeOption(.{});
 
-	// library			libary motor
-	// zig-src			source projet
-	// src_c			source c/c++
-	// zig-src/lib		source .h 
+	// library  libary motor
+	// zig-src  source projet
+	// src_c    source c/c++
+	// zig-src/lib  :source .h 
 
 
 
@@ -29,7 +29,7 @@ pub fn build(b: *std.Build) void {
 	});
 
 	// for match use regex 
-	//Prog.linkLibC();
+	// Prog.linkLibC();
 
 	// Resolve the 'library' dependency.
 	const library_dep = b.dependency("library", .{});

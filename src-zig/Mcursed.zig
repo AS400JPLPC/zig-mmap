@@ -315,7 +315,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 				"mail",
 				26, 32,		// Name , posx posy
 				100,		// width
-				"gloups@gmail.com", // text	error
+				"gloups@gmail.com", // text error
 				true,		// tofill
 				"required", // error msg
 				"",			// help default
@@ -788,7 +788,7 @@ pub fn main() !void {
 					20,
 					62, // posx, posy
 					7, // numbers lines
-					grd.gridStyle, // separator | or	space
+					grd.gridStyle, // separator | or space
 					grd.CADRE.line1, // type line 1
 				);
 

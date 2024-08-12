@@ -13,10 +13,10 @@ pub fn build(b: *std.Build) void {
 	const target   = b.standardTargetOptions(.{});
 	const optimize = b.standardOptimizeOption(.{});
 
-	// library			libary motor
-	// zig-src			source projet
-	// src_c			source c/c++
-	// zig-src/lib		source .h 
+	// library  libary motor
+	// zig-src  source projet
+	// src_c    source c/c++
+	// zig-src/lib source .h 
 
 
 
