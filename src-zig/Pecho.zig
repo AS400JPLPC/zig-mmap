@@ -8,7 +8,7 @@ const map = @import("zmmap");
 
 
 
-const plog	  = @import("logger").scoped;      // print file 
+const plog	  = @import("logcons").scoped;      // print file 
 
 //============================================================================================
 //-------------------------------

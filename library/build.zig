@@ -1,5 +1,6 @@
 	///-----------------------
 	/// build (library)
+	/// zig 0.12.0 dev
 	///-----------------------
 
 const std = @import("std");
@@ -40,6 +41,7 @@ pub fn build(b: *std.Build) void {
 		.imports = &.{
 		.{ .name = "cursed", .module = cursed_mod},
 		.{ .name = "utils",  .module = utils_mod},
+		.{ .name = "logcons",  .module = logcons_mod},
 		},
 	});
 
@@ -103,7 +105,7 @@ pub fn build(b: *std.Build) void {
 		
 		.{ .name = "callpgm",	.module = callpgm_mod },
 		.{ .name = "zmmap",		.module = zmmap_mod },
-		.{ .name = "crypto",		.module = crypto_mod },
+		.{ .name = "crypto",	.module = crypto_mod },
 		
 		.{ .name = "logger",	.module = logger_mod },
 		.{ .name = "logcons",	.module = logcons_mod },
