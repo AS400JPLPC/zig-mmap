@@ -580,10 +580,8 @@ pub const FnEnum = enum {
 	}
 
 	fn searchFn ( vtext: [] const u8 ) FnEnum {
-	var i	 :usize = 0;
-	const max :usize = @typeInfo(FnEnum).Enum.fields.len;
-		while( i < max ) : (i += 1) {
-		if ( std.mem.eql(u8, @tagName(@as(FnEnum,@enumFromInt(i))), vtext)) return @as(FnEnum,@enumFromInt(i));
+			inline for (@typeInfo(FnEnum).@"enum".fields) |f| {
+			if (std.mem.eql(u8, f.name, vtext)) return @as(FnEnum, @enumFromInt(f.value));
 		}
 		return FnEnum.none;
 
