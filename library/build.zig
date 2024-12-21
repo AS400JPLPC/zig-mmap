@@ -84,13 +84,10 @@ pub fn build(b: *std.Build) void {
 
 
 
+ 	decimal_mod.addSystemIncludePath(.{ .cwd_relative ="/usr/include/mpdecimal.h"});
+	decimal_mod.link_libc = true;
+	decimal_mod.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
 
-
-
-
-    decimal_mod.addIncludePath( b.path( "./lib/"));
-    decimal_mod.link_libc = true;
-    decimal_mod.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
 
 
     
