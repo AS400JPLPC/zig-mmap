@@ -1,7 +1,7 @@
-///-----------------------
-/// cursed
-/// connexion terminal
-///-----------------------
+    ///-----------------------
+    /// cursed
+    /// connexion terminal
+    ///-----------------------
 const std = @import("std");
 const utf = @import("std").unicode;
 
@@ -79,71 +79,32 @@ pub const BackgroundColor = enum(u8) { // terminal's background colors
 pub const ZONATRB = struct { styled: [4]u32, backgr: BackgroundColor, foregr: ForegroundColor };
 
 pub const iteratStr = struct {
-    var strbuf: []const u8 = undefined;
-
-    /// Errors that may occur when using String
-    pub const ErrNbrch = error{
-        InvalideAllocBuffer,
-    };
-
+ 
     pub const StringIterator = struct {
         buf: []u8,
         index: usize,
 
-        fn allocBuffer(size: usize) ErrNbrch![]u8 {
-            const buf = allocatorTerm.alloc(u8, size) catch {
-                return ErrNbrch.InvalideAllocBuffer;
-            };
-            return buf;
-        }
-
+  
         /// Deallocates the internal buffer
         pub fn deinit(self: *StringIterator) void {
             if (self.buf.len > 0) allocatorTerm.free(self.buf);
-            strbuf = "";
         }
 
         pub fn next(it: *StringIterator) ?[]const u8 {
-            const optional_buf: ?[]u8 = allocBuffer(strbuf.len) catch return null;
-
-            it.buf = optional_buf orelse "";
-            var idx: usize = 0;
-
-            while (true) {
-                if (idx >= strbuf.len) break;
-                it.buf[idx] = strbuf[idx];
-                idx += 1;
-            }
-
+            if ( it.buf.len == 0 ) return null;
+            
             if (it.index >= it.buf.len) return null;
-            idx = it.index;
-            it.index += getUTF8Size(it.buf[idx]);
-            return it.buf[idx..it.index];
+            const i = it.index;
+            it.index += getUTF8Size(it.buf[i]);
+            return it.buf[i..it.index];
         }
 
-        pub fn preview(it: *StringIterator) ?[]const u8 {
-            const optional_buf: ?[]u8 = allocBuffer(strbuf.len) catch return null;
-
-            it.buf = optional_buf orelse "";
-            var idx: usize = 0;
-            while (true) {
-                if (idx >= strbuf.len) break;
-                it.buf[idx] = strbuf[idx];
-                idx += 1;
-            }
-
-            if (it.index == 0) return null;
-            idx = it.buf.len;
-            it.index -= getUTF8Size(it.buf[idx]);
-            return it.buf[idx..it.index];
-        }
     };
 
     /// iterator String
     pub fn iterator(str: []const u8) StringIterator {
-        strbuf = str;
         return StringIterator{
-            .buf = undefined,
+            .buf = allocatorTerm.dupe(u8,str) catch unreachable,
             .index = 0,
         };
     }
