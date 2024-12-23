@@ -17,8 +17,8 @@ f_cls() {
 
 reset > /dev/null
 	echo -en '\033[1;1H'
-	echo -en '\033]11;#000000\007'
-	echo -en '\033]10;#FFFFFF\007'	 
+	#echo -en '\033]11;#000000\007'
+	#echo -en '\033]10;#FFFFFF\007'	 
 }
 
 f_pause(){
@@ -68,11 +68,11 @@ do
 	f_dsplyPos  1  24 $faGras$fcJaune 'Project: '$faGras$fcCyan$PROJECT
 
 	f_dsplyPos  3  24 $faGras$fcJaune '------------compile cpp-----------------'
-	f_dsplyPos  4  20 $faGras$fcRouge' 1.'; f_dsplyPos  4  24 $faGras$fcGreen 'Terminal-Gen'
+
 	f_dsplyPos  5  20 $faGras$fcRouge' 2.'; f_dsplyPos  5  24 $faGras$fcGreen 'APPTERM'
 
 	f_dsplyPos  6  24 $faGras$fcJaune '------------compile Zig-----------------'
-	f_dsplyPos  7  20 $faGras$fcRouge' 9.'; f_dsplyPos  7  24 $faGras$fcGreen 'Ptest'
+	f_dsplyPos  7  20 $faGras$fcRouge' 9.'; f_dsplyPos  7  24 $faGras$fcGreen 'flogger'
 	f_dsplyPos  8  20 $faGras$fcRouge'10.'; f_dsplyPos  8  24 $faGras$fcGreen 'Pmaitre'
 	f_dsplyPos  9  20 $faGras$fcRouge'11.'; f_dsplyPos  9  24 $faGras$fcGreen 'Pecho'
 	f_dsplyPos 10  20 $faGras$fcRouge'20.'; f_dsplyPos 10  24 $faGras$fcGreen 'Ecursed'
@@ -108,10 +108,7 @@ do
 
  		case "$choix" in
 
-# Gen
-		1)
-			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "Gen"
-		;;
+
 # APPTERM
 		2)
 			/home/soleil/.Terminal/dispatch.sh $envCPP $LIBPROJECT   "APPTERM"
@@ -120,7 +117,7 @@ do
 
 #Gencurs
 		9)
-			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Ptest"
+			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "flogger"
 		;;
 
 #Gencurs
