@@ -1,7 +1,6 @@
-///-----------------------
-/// build Pecho
-///-----------------------
-
+    ///-----------------------
+    /// build Ptest
+    ///-----------------------
 
 const std = @import("std");
 
@@ -22,22 +21,12 @@ pub fn build(b: *std.Build) void {
     // Building the executable
     
     const Prog = b.addExecutable(.{
-    .name = "Pcall",
-    .root_source_file =  b.path( "./Pcall.zig" ),
+    .name = "Ptest",
+    .root_source_file = b.path( "./Ptest.zig" ),
     .target = target,
     .optimize = optimize,
     });
 
-    // for match use regex 
-    //Prog.linkLibC();
-
-    // Resolve the 'library' dependency.
-    const library_dep = b.dependency("libtui", .{});
-
-    // Import the smaller 'cursed' and 'utils' modules exported by the library. etc...
-
-    Prog.root_module.addImport("callpgm", library_dep.module("callpgm"));
-    Prog.root_module.addImport("zmmap", library_dep.module("zmmap"));
 
 
     b.installArtifact(Prog);

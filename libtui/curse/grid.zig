@@ -495,7 +495,7 @@ pub const grd = struct {
     // return name -header ---> arraylist panel-grid
     pub fn getHeadersText(self: *GRID, r: usize) []const u8 {
         return self.header.items[r].text;
-    }
+            }
 
     // return posy -header ---> arraylist panel-grid
     pub fn getHeadersPosy(self: *GRID, r: usize) usize {
@@ -968,8 +968,8 @@ pub const grd = struct {
 
     ///------------------------------------
     /// manual = on return pageUp/pageDown no select
-    /// esc    = return no select
-    /// KEY    = return select valide ex: management Grid to Grid
+    /// esc = return no select
+    /// KEY = return select valide ex: management Grid to Grid
     /// enter  = return enter and line select
     /// -----------------------------------
     pub fn ioGridKey(self: *GRID, gKey: term.kbd, manual: bool) GridSelect {

@@ -137,7 +137,7 @@ fn creatFileMMAP() void {
     parmTimes = std.fmt.allocPrintZ(allocZmmap,"{d}" ,.{std.fmt.fmtIntSizeDec(timesStamp_ms)})  catch unreachable;
 
 
- 
+
     setNameFile();
 
     cDIR = std.fs.cwd().openDir(dirfile,.{}) catch unreachable;
