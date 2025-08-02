@@ -617,3 +617,9 @@ var LDA = map.echoMmap(pgmPARM)
 *   •upgrade  2025-08-01.<BR />
 &nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version   0.15.dev  -->  Token<BR /> 
 
+
+<BR />
+*   •upgrade  2025-08-02.<BR />   
+*Alignment of Print WriteAll functions in all modules and Pause.<BR />
+This is for my tests, to see how it goes and check, and to see how the memory is managed.
+<BR /><BR />

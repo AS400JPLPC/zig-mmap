@@ -17,17 +17,17 @@ const plog   = @import("logger").scoped;      // print file
 
 var out = std.fs.File.stdout().writerStreaming(&.{});
 pub inline fn Print( comptime format: []const u8, args: anytype) void {
-    out.interface.print(format, args) catch return;
+    out.interface.print(format, args) catch {};
 }
 pub inline fn WriteAll( args: anytype) void {
-    out.interface.writeAll(args) catch return;
+    out.interface.writeAll(args) catch {};
 }
 
 
 var in = std.fs.File.stdin().readerStreaming(&.{});
 fn Pause() void{
     WriteAll("Pause\r\n");
-    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var buf: [16]u8 =  undefined;
     var c  : usize = 0;
     while (c <= 0) {
         c = in.interface.readVec(&.{&buf}) catch unreachable;

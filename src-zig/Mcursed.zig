@@ -61,7 +61,7 @@ fn Pause() void{
 var out = std.fs.File.stdout().writerStreaming(&.{});
     out.interface.writeAll("\nPause\r\n") catch unreachable;
 var stdin = std.fs.File.stdin();
-    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var buf: [16]u8 = undefined;
     var c  : usize = 0;
     while (c == 0) {
         c = stdin.read(&buf) catch unreachable;

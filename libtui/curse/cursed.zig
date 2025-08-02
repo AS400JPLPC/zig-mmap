@@ -16,18 +16,18 @@ var original_termios: os.linux.termios = undefined;
 var use_termios: os.linux.termios = undefined;
 
 
-//get stdin  -> read
-var stdin = std.fs.File.stdin();
-
 
 //============================================================================================
+var stdin = std.fs.File.stdin();
 var stdout = std.fs.File.stdout().writerStreaming(&.{});
-pub inline fn Print( comptime format: []const u8, args: anytype) !void {
-    try stdout.interface.print(format, args) ;
+
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    stdout.interface.print(format,args )  catch {} ;
 }
-pub inline fn WriteAll( args: anytype) !void {
-    try stdout.interface.writeAll(args);
+pub inline fn WriteAll( args: [] const u8) void {
+    stdout.interface.writeAll(args)  catch {} ;
 }
+
 //============================================================================================
 
 
@@ -130,12 +130,12 @@ pub fn flushIO() void {
 ///-------------
 /// onMouse
 pub fn onMouse() void {
-    WriteAll("\x1b[?1000;1005;1006h") catch {};
+    WriteAll("\x1b[?1000;1005;1006h");
 }
 
 /// offMouse
 pub fn offMouse() void {
-    WriteAll("\x1b[?1000;1005;1006l") catch {};
+    WriteAll("\x1b[?1000;1005;1006l");
 }
 
 ///-------------
@@ -143,33 +143,33 @@ pub fn offMouse() void {
 ///-------------
 /// Clear from cursor until end of screen
 pub fn cls_from_cursor_toEndScreen() void {
-    WriteAll("\x1b[0J") catch {};
+    WriteAll("\x1b[0J");
 }
 
 /// Clear from cursor to beginning of screen
 pub fn cls_from_cursor_toStartScreen() void {
-    WriteAll("\x1b[1J") catch {};
+    WriteAll("\x1b[1J");
 }
 
 /// Clear all screen
 pub fn cls() void {
-    WriteAll("\x1b[2J") catch {};
-    WriteAll("\x1b[3J") catch {};
+    WriteAll("\x1b[2J");
+    WriteAll("\x1b[3J");
 }
 
 /// Clear from cursor to end of line
 pub fn cls_from_cursor_toEndline() void {
-    WriteAll("\x1b[0K") catch {};
+    WriteAll("\x1b[0K");
 }
 
 /// Clear start of line to the cursor
 pub fn cls_from_cursor_toStartLine() void {
-    WriteAll("\x1b[1K") catch {};
+    WriteAll("\x1b[1K");
 }
 
 /// Clear from cursor to end of line
 pub fn cls_line() void {
-    WriteAll("\x1b[2K") catch {};
+    WriteAll("\x1b[2K");
 }
 
 ///-------------
@@ -181,65 +181,65 @@ pub var posCurs: Point = undefined;
 
 /// Moves cursor to `x` column and `y` row
 pub fn gotoXY(x: usize, y: usize) void {
-    Print("\x1b[{d};{d}H", .{ x, y }) catch {};
+    Print("\x1b[{d};{d}H", .{ x, y });
 }
 
 /// Moves cursor up `y` rows
 pub fn gotoUp(x: usize) void {
-    Print("\x1b[{d}A", .{x}) catch {};
+    Print("\x1b[{d}A", .{x});
 }
 
 /// Moves cursor down `y` rows
 pub fn gotoDown(x: usize) void {
-    Print("\x1b[{d}B", .{x}) catch {};
+    Print("\x1b[{d}B", .{x});
 }
 
 /// Moves cursor left `y` columns
 pub fn gotoLeft(y: usize) void {
-    Print("\x1b[{d}D", .{y}) catch {};
+    Print("\x1b[{d}D", .{y});
 }
 
 /// Moves cursor right `y` columns
 pub fn gotoRight(y: usize) void {
-    Print("\x1b[{d}C", .{y}) catch {};
+    Print("\x1b[{d}C", .{y});
 }
 
 /// Hide the cursor
 pub fn cursHide() void {
-    Print("\x1b[?25l", .{}) catch {};
+     WriteAll("\x1b[?25l");
 }
 
 /// Show the cursor
 pub fn cursShow() void {
-    WriteAll("\x1b[?25h") catch {};
+    WriteAll("\x1b[?25h");
 }
 
 pub fn defCursor(e_curs: typeCursor) void {
     // define type Cursor form terminal
     switch (e_curs) {
         .cDefault => {
-            WriteAll("\x1b[0 q") catch {}; // 0 → default terminal
+            WriteAll("\x1b[0 q"); // 0 → default terminal
         },
         .cBlink => {
-            WriteAll("\x1b[1 q") catch {}; // 1 → blinking block
+            WriteAll("\x1b[1 q"); // 1 → blinking block
         },
         .cSteady => {
-            WriteAll("\x1b[2 q") catch {}; // 2 → steady block
+            WriteAll("\x1b[2 q"); // 2 → steady block
         },
         .cBlinkUnderline => {
-            WriteAll("\x1b[3 q") catch {}; // 3 → blinking underlines
+            WriteAll("\x1b[3 q"); // 3 → blinking underlines
         },
         .cSteadyUnderline => {
-            WriteAll("\x1b[4 q") catch {}; // 4 → steady underlines
+            WriteAll("\x1b[4 q"); // 4 → steady underlines
         },
         .cBlinkBar => {
-            WriteAll("\x1b[5 q") catch {}; // 5 → blinking bar
+            WriteAll("\x1b[5 q"); // 5 → blinking bar
         },
         .cSteadyBar => {
-            WriteAll("\x1b[6 q") catch {}; // 6 → steady bar
+            WriteAll("\x1b[6 q"); // 6 → steady bar
         },
     }
-    WriteAll("\x1b[?25h") catch {};
+    WriteAll("\x1b[?25h");
 }
 
 fn convIntCursor(x: u8) usize {
@@ -260,8 +260,8 @@ fn convIntCursor(x: u8) usize {
 
 pub fn getCursor() void {
     // get Cursor form terminal
-    var cursBuf: [16]u8 = [_]u8{0} ** 16;
-
+    // var cursBuf: [16]u8 = [_]u8{0} ** 16;
+    var cursBuf: [16]u8 = undefined;
     posCurs.x = 0;
 
     posCurs.y = 0;
@@ -269,7 +269,7 @@ pub fn getCursor() void {
     flushIO();
 
     // Don't forget to flush!
-    WriteAll("\x1b[?6n") catch {};
+    WriteAll("\x1b[?6n");
 
     var c: usize = 0;
     while (c == 0) {
@@ -321,26 +321,26 @@ pub fn getCursor() void {
 ///-------------------------
 /// Reset the terminal style.
 pub fn resetStyle() void {
-    WriteAll("\x1b[0m") catch {};
+    WriteAll("\x1b[0m");
 }
 
 /// Sets the terminal style.
 fn setStyle(style: [4]u32) void {
     for (style) |v| {
         if (v != 0) {
-            Print("\x1b[{d}m", .{v}) catch {};
+            Print("\x1b[{d}m", .{v});
         }
     }
 }
 
 /// Sets the terminal's foreground color.
 fn setForegroundColor(color: ForegroundColor) void {
-    Print("\x1b[38;5;{d}m", .{@intFromEnum(color)}) catch {};
+    Print("\x1b[38;5;{d}m", .{@intFromEnum(color)});
 }
 
 /// Sets the terminal's Background color.
 fn setBackgroundColor(color: BackgroundColor) void {
-    Print("\x1b[48;5;{d}m", .{@intFromEnum(color)}) catch {};
+    Print("\x1b[48;5;{d}m", .{@intFromEnum(color)});
 }
 
 /// write text and attribut
@@ -348,7 +348,7 @@ pub fn writeStyled(text: []const u8, attribut: ZONATRB) void {
     setForegroundColor(attribut.foregr);
     setBackgroundColor(attribut.backgr);
     setStyle(attribut.styled);
-    Print("{s}\x1b[0m", .{text}) catch {};
+    Print("{s}\x1b[0m", .{text});
 }
 
 ///-------------------------
@@ -426,9 +426,9 @@ pub fn enableRawMode() void {
 
 /// Clear gross terminal
 fn reset() void {
-    WriteAll("\x1bc") catch {};
+    WriteAll("\x1bc");
 
-    WriteAll("\x1b[H") catch {};
+    WriteAll("\x1b[H");
 }
 
 /// Returns to the previous terminal state
@@ -464,7 +464,7 @@ pub fn getSize() TermSize {
 /// Update title terminal
 pub fn titleTerm(title: []const u8) void {
     if (title.len > 0) {
-        Print("\x1b]0;{s}\x07", .{title}) catch {};
+        Print("\x1b]0;{s}\x07", .{title});
     }
 }
 
@@ -475,7 +475,7 @@ pub fn titleTerm(title: []const u8) void {
 
 pub fn resizeTerm(line: usize, cols: usize) void {
     if (line > 0 and cols > 0) {
-        Print("\x1b[8;{d};{d};t", .{ line, cols }) catch {};
+        Print("\x1b[8;{d};{d};t", .{ line, cols });
     }
 }
 

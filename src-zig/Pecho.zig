@@ -9,16 +9,16 @@ const map = @import("zmmap");
 
 var out = std.fs.File.stdout().writerStreaming(&.{});
 pub inline fn Print( comptime format: []const u8, args: anytype) void {
-    out.interface.print(format, args) catch return;
+    out.interface.print(format, args) catch {};
  }
 pub inline fn WriteAll( args: anytype) void {
-    out.interface.writeAll(args) catch return;
+    out.interface.writeAll(args) catch {};
  }
 fn Pause() void{
 
     WriteAll("\nPause\r\n");
 var stdin = std.fs.File.stdin();
-    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var buf: [16]u8 =  undefined;
     var c  : usize = 0;
     while (c == 0) {
         c = stdin.read(&buf) catch unreachable;

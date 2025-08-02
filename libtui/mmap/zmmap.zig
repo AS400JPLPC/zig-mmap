@@ -5,14 +5,6 @@
 
 const std = @import("std");
 const cry = @import("crypto");
-pub inline fn Print( comptime format: []const u8, args: anytype) void {
-    var out = std.fs.File.stdout().writerStreaming(&.{});
-    out.interface.print(format, args) catch return;
- }
-pub inline fn WriteAll( args: anytype) void {
-    var out = std.fs.File.stdout().writerStreaming(&.{});
-    out.interface.writeAll(args) catch return;
- }
 pub fn Perror(msg :  [] const u8) noreturn{
     var out = std.fs.File.stdout().writerStreaming(&.{});
     out.interface.print("Veuillez corriger  {s}\n",.{msg}) catch unreachable;
@@ -24,6 +16,18 @@ var stdin = std.fs.File.stdin();
     }
  @panic(msg);
 }
+
+
+//=======================================================================
+// For debeug
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    var out = std.fs.File.stdout().writerStreaming(&.{});
+    out.interface.print(format, .{args}) catch return;
+ }
+pub inline fn WriteAll( args: [] const u8) void {
+    var out = std.fs.File.stdout().writerStreaming(&.{});
+    out.interface.writeAll(args) catch return;
+ }
 pub fn Pause() void {
     var out = std.fs.File.stdout().writerStreaming(&.{});
     out.interface.print("iPause \n",.{}) catch unreachable;
@@ -34,6 +38,9 @@ var stdin = std.fs.File.stdin();
         c = stdin.read(&buf) catch unreachable;
     }
 }
+
+//=======================================================================
+
 
 const errmap = error{
     violation_integrite_rcvkey_fileKEY,
