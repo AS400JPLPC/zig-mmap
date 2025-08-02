@@ -794,7 +794,7 @@ pub fn lock() void {
  }
 
 pub fn islock() bool {
-    var buffer :[]u8 = allocZmmap.alloc( u8, 1024) catch unreachable;
+    var buffer :[]u8 = allocZmmap.alloc( u8, 16) catch unreachable;
     defer allocZmmap.free(buffer);
 
     COM.ZPWR.seekTo(0) catch unreachable;
