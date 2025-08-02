@@ -21,15 +21,15 @@ pub fn build(b: *std.Build) void {
 
     // Building the executable
     
-    const Prog = b.addExecutable(.{
-    .name = "Pecho",
-    .root_source_file = b.path( "./Pecho.zig" ),
-    .target = target,
-    .optimize = optimize,
+     const Prog = b.addExecutable(.{
+        .name = "Pecho",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./Pecho.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
-    // for match use regex 
-    //Prog.linkLibC();
 
     // Resolve the 'library' dependency.
     const library_dep = b.dependency("libtui", .{});
@@ -41,13 +41,13 @@ pub fn build(b: *std.Build) void {
     Prog.root_module.addImport("forms", library_dep.module("forms"));
     Prog.root_module.addImport("grid",  library_dep.module("grid"));
     Prog.root_module.addImport("menu", library_dep.module("menu"));
-    Prog.root_module.addImport("callpgm", library_dep.module("callpgm"));
 
+    Prog.root_module.addImport("callpgm", library_dep.module("callpgm"));
     Prog.root_module.addImport("crypto", library_dep.module("crypto"));
     Prog.root_module.addImport("zmmap", library_dep.module("zmmap"));
     
 
-    Prog.root_module.addImport("logcons", library_dep.module("logcons"));
+    Prog.root_module.addImport("logger", library_dep.module("logger"));
 
     b.installArtifact(Prog);
 

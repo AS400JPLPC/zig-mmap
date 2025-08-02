@@ -20,18 +20,21 @@ pub fn build(b: *std.Build) void {
 
     // Building the executable
     
-    const Prog = b.addExecutable(.{
-    .name = "Mcursed",
-    .root_source_file = b.path( "./Mcursed.zig" ),
-    .target = target,
-    .optimize = optimize,
+     const Prog = b.addExecutable(.{
+        .name = "Mcursed",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./Mcursed.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
+
 
     // for match use regex 
     // Prog.linkLibC();
 
     // Resolve the 'library' dependency.
-    const library_dep = b.dependency("library", .{});
+   const library_dep = b.dependency("libtui", .{});
 
     // Import the smaller 'cursed' and 'utils' modules exported by the library. etc...
     Prog.root_module.addImport("cursed", library_dep.module("cursed"));

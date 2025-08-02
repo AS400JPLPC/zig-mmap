@@ -11,9 +11,7 @@ pub fn build(b: *std.Build) void {
 	const logger_mod = b.addModule("logger", .{
 		.root_source_file =  b.path( "./log/logger.zig" ),
 	});
-	const logcons_mod = b.addModule("logcons", .{
-		.root_source_file =  b.path( "./log/logcons.zig" ),
-	});
+
 	const logsrc_mod = b.addModule("logsrc", .{
 		.root_source_file =  b.path( "./log/logsrc.zig" ),
 	});
@@ -24,6 +22,9 @@ pub fn build(b: *std.Build) void {
 
 	const utils_mod = b.addModule("utils", .{
 		.root_source_file = b.path( "./curse/utils.zig" ),
+		.imports= &.{
+		.{ .name = "cursed", .module = cursed_mod },
+		},
 	});
 
 	const mvzr_mod = b.addModule("mvzr", .{
@@ -44,7 +45,6 @@ pub fn build(b: *std.Build) void {
 		.imports = &.{
 		.{ .name = "cursed", .module = cursed_mod},
 		.{ .name = "utils",  .module = utils_mod},
-		.{ .name = "logcons",  .module = logcons_mod},
 		},
 	});
 
@@ -97,7 +97,6 @@ pub fn build(b: *std.Build) void {
 		.{ .name = "crypto",	.module = crypto_mod },
 		
 		.{ .name = "logger",	.module = logger_mod },
-		.{ .name = "logcons",	.module = logcons_mod },
 		.{ .name = "logsrc",	.module = logsrc_mod },
 
 		},

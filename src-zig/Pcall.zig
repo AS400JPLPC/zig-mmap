@@ -6,15 +6,37 @@ const std = @import("std");
 const map = @import("zmmap");
 const mdl = @import("callpgm");
 
+const deb_Log = @import("logger").openFile;   // open  file
+const end_Log = @import("logger").closeFile;  // close file
+const plog   = @import("logger").scoped;      // print file 
 
-const stdin = std.io.getStdIn().reader();
-var buf: [4]u8 = undefined;
 
-const out = std.io.getStdOut();
-var   w   = out.writer();
 
 
 //============================================================================================
+
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+}
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+}
+
+
+var in = std.fs.File.stdin().readerStreaming(&.{});
+fn Pause() void{
+    WriteAll("Pause\r\n");
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c <= 0) {
+        c = in.interface.readVec(&.{&buf}) catch unreachable;
+    }
+}
+
+//============================================================================================
+// Common core for communication between two programs.
+
 //-------------------------------
 // datarea communication 
 //-------------------------------
@@ -94,17 +116,17 @@ fn ldaToUDS(vlda: map.COMLDA) COMUDS {
     var i : usize = 0;
     while (it.next()) |chunk| :( i += 1) {
             switch(i) {
-            0  => vuds.zua1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            1  => vuds.zua2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            2  => vuds.zua3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            3  => vuds.zua4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            4  => vuds.zua5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
+            0  => vuds.zua1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            1  => vuds.zua2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            2  => vuds.zua3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            3  => vuds.zua4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            4  => vuds.zua5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
             
-            5  => vuds.zun1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            6  => vuds.zun2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            7  => vuds.zun3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            8  => vuds.zun4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            9  => vuds.zun5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
+            5  => vuds.zun1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            6  => vuds.zun2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            7  => vuds.zun3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            8  => vuds.zun4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            9  => vuds.zun5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
             
             10 => vuds.zu8  = std.fmt.parseInt(u8,chunk,10) catch unreachable,
             11 =>{    if (std.mem.eql(u8,chunk, "true")) vuds.zcomit = true
@@ -125,7 +147,7 @@ fn getPgmArgs() void {
     defer args_it.deinit();
     while(args_it.next()) |arg|  {
         nParm += 1;
-        // std.debug.print("\n{d}",.{nParm}); std.debug.print("{s}",.{arg});
+        //std.debug.print("\n{d}",.{nParm}); std.debug.print("{s}",.{arg});
         if(nParm == 1) pgmName = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
         if(nParm == 2) pgmPARM = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
     }
@@ -142,9 +164,12 @@ pub fn main() !void {
     // émulation décisionel
     // const pgmPARM_null : ?[] const u8 = null;
     // // caller program  spanwait
-    // try mdl.callPgmPid("APPTERM", "Mcursed", pgmPARM_null);
-    
+    // try mdl.callPgmPid("APPTERM", "Mcursed",KEY);
+    // APPTERM = terminal libvte
+    // SH ./bin.sh
     //=====================================================
+
+
 
     // initialisation communication
     var UDS = initUDS();
@@ -159,50 +184,82 @@ pub fn main() !void {
     UDS.zun5  = "123456.0123";
     UDS.zu8   = 25;
     UDS.zcomit  = false;
-    try    w.print("stop 1a/4 fin\r\n", .{});
+  deb_Log("Pcall.txt");
+ 
+    plog(.main).debug("ecriture USD to LDA\r\n",.{});
+        plog(.main).debug("\n LDA.user  {s}", .{LDA.user});
+        plog(.main).debug("\n LDA.Init  {s}", .{LDA.init});
 
+        plog(.main).debug("\n LDA.Echo  {s}", .{LDA.echo});
+        plog(.main).debug("\n LDA.reply {}",  .{LDA.reply});
+        plog(.main).debug("\n LDA.abort {}",  .{LDA.abort});
+        
+        plog(.main).debug("\n UDS.zua1  {s}", .{UDS.zua1});
+        plog(.main).debug("\n UDS.zua2  {s}", .{UDS.zua2});
+        plog(.main).debug("\n UDS.zua3  {s}", .{UDS.zua3});
+        plog(.main).debug("\n UDS.zua4  {s}", .{UDS.zua4});
+        plog(.main).debug("\n UDS.zua5  {s}", .{UDS.zua5});
+        
+        plog(.main).debug("\n UDS.zun1  {s}", .{UDS.zun1});
+        plog(.main).debug("\n UDS.zun2  {s}", .{UDS.zun2});
+        plog(.main).debug("\n UDS.zun3  {s}", .{UDS.zun3});
+        plog(.main).debug("\n UDS.zun4  {s}", .{UDS.zun4});
+        plog(.main).debug("\n UDS.zun5  {s}", .{UDS.zun5});
+ end_Log();
+  
     udsToLDA(UDS, &LDA);
-    map.writeLDA(&LDA);
+    try map.writeLDA(&LDA);
 
 
     // calling program ECHO  spanwait:
-    try mdl.callPgmPid("APPTERM", "Mcursed", map.getParm()); 
-                            // catch |err| std.debug.panic("err: {any}",.{err});
-    
+
+
+    mdl.callPgmPid("APPTERM", "Mcursed", map.getParm(),true) 
+                            catch |err| std.debug.panic("err: {any}",.{err});
+  
     // retrive group datarea
-    LDA = map.readLDA();
+    LDA = try map.readLDA();
     UDS = ldaToUDS(LDA);
+  deb_Log("Pcall2.txt");
+   
+ plog(.reply).debug("\n map.getParm {s}", .{map.getParm()});
+
+ Pause();
 
 
+ 
     if (LDA.reply == true) {
-        try    w.print("\n LDA.user  {s}", .{LDA.user});
-        try    w.print("\n LDA.Init  {s}", .{LDA.init});
+        plog(.reply).debug("\n LDA.user  {s}", .{LDA.user});
+        plog(.reply).debug("\n LDA.Init  {s}", .{LDA.init});
 
-        try    w.print("\n LDA.Echo  {s}", .{LDA.echo});
-        try    w.print("\n LDA.reply {}",  .{LDA.reply});
-        try    w.print("\n LDA.abort {}",  .{LDA.abort});
+        plog(.reply).debug("\n LDA.Echo  {s}", .{LDA.echo});
+        plog(.reply).debug("\n LDA.reply {}",  .{LDA.reply});
+        plog(.reply).debug("\n LDA.abort {}",  .{LDA.abort});
         
-        try    w.print("\n UDS.zua1  {s}", .{UDS.zua1});
-        try    w.print("\n UDS.zua2  {s}", .{UDS.zua2});
-        try    w.print("\n UDS.zua3  {s}", .{UDS.zua3});
-        try    w.print("\n UDS.zua4  {s}", .{UDS.zua4});
-        try    w.print("\n UDS.zua5  {s}", .{UDS.zua5});
+        plog(.reply).debug("\n UDS.zua1  {s}", .{UDS.zua1});
+        plog(.reply).debug("\n UDS.zua2  {s}", .{UDS.zua2});
+        plog(.reply).debug("\n UDS.zua3  {s}", .{UDS.zua3});
+        plog(.reply).debug("\n UDS.zua4  {s}", .{UDS.zua4});
+        plog(.reply).debug("\n UDS.zua5  {s}", .{UDS.zua5});
         
-        try    w.print("\n UDS.zun1  {s}", .{UDS.zun1});
-        try    w.print("\n UDS.zun2  {s}", .{UDS.zun2});
-        try    w.print("\n UDS.zun3  {s}", .{UDS.zun3});
-        try    w.print("\n UDS.zun4  {s}", .{UDS.zun4});
-        try    w.print("\n UDS.zun5  {s}", .{UDS.zun5});
+        plog(.reply).debug("\n UDS.zun1  {s}", .{UDS.zun1});
+        plog(.reply).debug("\n UDS.zun2  {s}", .{UDS.zun2});
+        plog(.reply).debug("\n UDS.zun3  {s}", .{UDS.zun3});
+        plog(.reply).debug("\n UDS.zun4  {s}", .{UDS.zun4});
+        plog(.reply).debug("\n UDS.zun5  {s}", .{UDS.zun5});
         
-        try    w.print("\n UDS.zu8   {d}", .{UDS.zu8});
-        try    w.print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
+        plog(.reply).debug("\n UDS.zu8   {d}", .{UDS.zu8});
+        plog(.reply).debug("\n UDS.zcomit {}\n",  .{UDS.zcomit});
 
         
-    } else try    w.print("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
+    } else plog(.reply).debug("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
     
     // work end code ...
+    
     map.released();
-    try    w.print("\nstop 3/3 fin\r\n", .{});
-    buf = [_]u8{0} ** 4;
-    _ = try stdin.readUntilDelimiterOrEof(buf[0..3], '\n');
+    plog(.main).info("\nstop fin\r\n",.{});
+
+    end_Log();
+    Pause();
+                        
 }

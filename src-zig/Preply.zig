@@ -6,7 +6,7 @@ const std = @import("std");
 const map = @import("zmmap");
 
 
-
+//============================================================================================
 var out = std.fs.File.stdout().writerStreaming(&.{});
 pub inline fn Print( comptime format: []const u8, args: anytype) void {
     out.interface.print(format, args) catch return;
@@ -146,61 +146,48 @@ pub const ErrorTest = error{
 
 
 pub fn main() !void {
-    WriteAll("\r\nPecho.txt");
-    WriteAll("\r\nBegin\n");
 
     getPgmArgs();
-    Print("\r\nnParm {d}\n",.{nParm});
     
     var UDS : COMUDS =initUDS();
-if (nParm == 2 ) {
+if (nParm != 2 ) return ErrorTest.Testcontrol_errror;
 
+var zun5 : i32 = 0;
+var buf: [256]u8 = undefined;
+var LDA = map.echoMmap(pgmPARM) 
+            catch | err| {
+            const s = @src();
+            map.Perror(std.fmt.allocPrint(allocUDS,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}  err:{})\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,err})
+             catch unreachable);
+                };
 
-// for Test for error recovery and visibility  
-// if ( nParm > 0) return ErrorTest.Testcontrol_errror;
-
-
-    Print("\r\nParm {s}\n",.{pgmPARM});
-    Pause();    
-    WriteAll("\r\nechoMmap\n");
-    var LDA = map.echoMmap(pgmPARM) 
-                catch | err| {
-                const s = @src();
-                map.Perror(std.fmt.allocPrint(allocUDS,
-                "\n\n\r file:{s} line:{d} column:{d} func:{s}  err:{})\n\r"
-                ,.{s.file, s.line, s.column,s.fn_name,err})
-                 catch unreachable);
-                    };
-    WriteAll("\r\nreadLDA");  
-    LDA = try map.readLDA();
-    LDA.abort = true;
-    UDS = ldaToUDS(LDA);
-        WriteAll("\r\nTest emolation traitement de la LDA"); Pause(); 
-        Print("\r\nLDA.user  {s}", .{LDA.user});
-        Print("\r\nLDA.Init  {s}", .{LDA.init});
-        Print("\r\nLDA.Echo  {s}", .{LDA.echo});
-        Print("\r\nLDA.reply {}",  .{LDA.reply});
-        Print("\r\nLDA.abort {}",  .{LDA.abort});
-        Print("\r\nLDA.zua1  {s}", .{UDS.zua1});
-        Print("\r\nLDA.zua2  {s}", .{UDS.zua2});
-        Print("\r\nLDA.zua3  {s}", .{UDS.zua3});
-        Print("\r\nLDA.zua5  {s}", .{UDS.zua5});
-        Print("\r\nLDA.zun5  {s}", .{UDS.zun5});
-
+            
+ LDA = try map.readLDA();
+ UDS = ldaToUDS(LDA);
+            
+    while (!LDA.abort) {
         
- WriteAll("\r\nlook in qtemp for files\n");Pause();
+        if (LDA.reply == false) { 
 
- WriteAll("\r\nreleased()\n");
-      map.released();
-WriteAll("\r\nlook in qtemp the files are deleted\n");Pause();
- WriteAll("\r\nEnd Pecho\n"); Pause();
-   
-
-    } else {
-        // work traitement
-
-        // end traitement
+            zun5 = try std.fmt.parseInt(i32, UDS.zun5, 10);
+            zun5 += @intCast(UDS.zu8);
+            buf = undefined;
+            UDS.zun5  = std.fmt.bufPrintZ(&buf, "{}", .{zun5}) catch unreachable;
+            LDA.reply = true;
+            if ( zun5 == 10000) { UDS.zcomit = true; LDA.abort = true ;}
+            udsToLDA(UDS, &LDA);
+            try map.writeLDA(&LDA);
+            map.lock();
+        }
+        if (!LDA.abort) {
+            while ( true )  {
+                std.posix.nanosleep(0,1_000);
+                if ( !map.islock() ) break;            
+            }
+            LDA = try map.readLDA();
+            UDS = ldaToUDS(LDA);
+        }    
     }
-
- 
 }

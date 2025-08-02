@@ -17,15 +17,17 @@ pub fn build(b: *std.Build) void {
     // zig-src/lib source .h 
 
 
-
     // Building the executable
     
-    const Prog = b.addExecutable(.{
-    .name = "Ecursed",
-    .root_source_file = b.path( "./Ecursed.zig" ),
-    .target = target,
-    .optimize = optimize,
+     const Prog = b.addExecutable(.{
+        .name = "Ecursed",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./Ecursed.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
+
 
     // for match use regex 
     // Prog.linkLibC();

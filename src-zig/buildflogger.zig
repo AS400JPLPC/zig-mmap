@@ -20,11 +20,14 @@ pub fn build(b: *std.Build) void {
     // Building the executable
     
     const Prog = b.addExecutable(.{
-    .name = "flogger",
-    .root_source_file = b.path( "./flogger.zig" ),
-    .target = target,
-    .optimize = optimize,
+        .name = "flogger",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./flogger.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
+
 
     // for match use regex 
     //Prog.linkLibC();

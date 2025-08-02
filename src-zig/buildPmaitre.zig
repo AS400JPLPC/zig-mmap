@@ -20,14 +20,18 @@ pub fn build(b: *std.Build) void {
 
     // Building the executable
     
-    const Prog = b.addExecutable(.{
-    .name = "Pmaitre",
-    .root_source_file = b.path( "./Pmaitre.zig" ),
-    .target = target,
-    .optimize = optimize,
+     const Prog = b.addExecutable(.{
+        .name = "Pmaitre",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path( "./Pmaitre.zig" ),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     // for match use regex 
+
+
     //Prog.linkLibC();
 
     // Resolve the 'library' dependency.

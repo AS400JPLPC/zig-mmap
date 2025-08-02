@@ -87,17 +87,17 @@ fn ldaToUDS(vlda: map.COMLDA) COMUDS {
     var i : usize = 0;
     while (it.next()) |chunk| :( i += 1) {
             switch(i) {
-            0  => vuds.zua1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            1  => vuds.zua2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            2  => vuds.zua3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            3  => vuds.zua4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            4  => vuds.zua5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
+            0  => vuds.zua1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            1  => vuds.zua2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            2  => vuds.zua3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            3  => vuds.zua4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            4  => vuds.zua5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
             
-            5  => vuds.zun1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            6  => vuds.zun2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            7  => vuds.zun3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            8  => vuds.zun4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            9  => vuds.zun5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
+            5  => vuds.zun1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            6  => vuds.zun2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            7  => vuds.zun3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            8  => vuds.zun4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            9  => vuds.zun5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
             
             10 => vuds.zu8  = std.fmt.parseInt(u8,chunk,10) catch unreachable,
             11 =>{    if (std.mem.eql(u8,chunk, "true")) vuds.zcomit = true
@@ -126,12 +126,27 @@ fn getPgmArgs() void {
 
 //============================================================================================
 
-const out = std.io.getStdOut();
-var   w   = out.writer();
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+}
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+}
 
 
-const stdin = std.io.getStdIn().reader();
-var buf: [3]u8 = undefined;
+var in = std.fs.File.stdin().readerStreaming(&.{});
+fn Pause() void{
+    WriteAll("Pause\r\n");
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c <= 0) {
+        c = in.interface.readVec(&.{&buf}) catch unreachable;
+    }
+}
+
+//============================================================================================
+
 const allocator = std.heap.page_allocator;
 pub fn main() !void {
 
@@ -140,79 +155,83 @@ pub fn main() !void {
     // const pgmPARM : ?[] const u8 = null;
     // try mdl.callPgmPid("APPTERM", "Mcursed", pgmPARM);
     
-    std.debug.print("stop 1/3 fin\r\n", .{});
-    buf = [_]u8{0} ** 3;
-    _ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
+    WriteAll("stop 1/3 fin\r\n");
+    Pause();
 
     // initialisation communication
     var UDS : COMUDS = initUDS();
     var LDA = map.masterMmap() catch @panic("erreur system zmmap");
     getPgmArgs();
 
-    try    w.print("pgmName  {s}\r\n", .{pgmName});
 
+
+
+    Print("pgmName  {s}\r\n", .{pgmName});
+    Pause();
     LDA.init = pgmName;
     UDS.zua1 = "bonjour";
     UDS.zua2 = "premier test";
     UDS.zua3 = "";
     UDS.zun5 = "123456.0123";
     UDS.zcomit  = false;
-    
-        try    w.print("\n LDA.user  {s}", .{LDA.user});
-        try    w.print("\n LDA.Init  {s}", .{LDA.init});
-        try    w.print("\n LDA.Echo  {s}", .{LDA.echo});
-        try    w.print("\n LDA.reply {}",  .{LDA.reply});
-        try    w.print("\n LDA.abort {}",  .{LDA.abort});
-        try    w.print("\n LDA.zua1  {s}", .{UDS.zua1});
-        try    w.print("\n LDA.zua2  {s}", .{UDS.zua2});
-        try    w.print("\n LDA.zua3  {s}", .{UDS.zua3});
-        try    w.print("\n LDA.zua4  {s}", .{UDS.zua4});
-        try    w.print("\n LDA.zun1  {s}", .{UDS.zun1});
-        try    w.print("\n LDA.zun2  {s}", .{UDS.zun2});
-        try    w.print("\n LDA.zun3  {s}", .{UDS.zun3});
-        try    w.print("\n LDA.zun4  {s}", .{UDS.zun4});
-        try    w.print("\n LDA.zun5  {s}", .{UDS.zun5});
-        try    w.print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
+
+    Pause();
+   
+        Print("\n LDA.user  {s}", .{LDA.user});
+        Print("\n LDA.Init  {s}", .{LDA.init});
+        Print("\n LDA.Echo  {s}", .{LDA.echo});
+        Print("\n LDA.reply {}",  .{LDA.reply});
+        Print("\n LDA.abort {}",  .{LDA.abort});
+        Print("\n LDA.zua1  {s}", .{UDS.zua1});
+        Print("\n LDA.zua2  {s}", .{UDS.zua2});
+        Print("\n LDA.zua3  {s}", .{UDS.zua3});
+        Print("\n LDA.zua4  {s}", .{UDS.zua4});
+        Print("\n LDA.zun1  {s}", .{UDS.zun1});
+        Print("\n LDA.zun2  {s}", .{UDS.zun2});
+        Print("\n LDA.zun3  {s}", .{UDS.zun3});
+        Print("\n LDA.zun4  {s}", .{UDS.zun4});
+        Print("\n LDA.zun5  {s}", .{UDS.zun5});
+        Print("\n UDS.zcomit {}\n",  .{UDS.zcomit});    Pause();
+
     // transmit the request
     udsToLDA(UDS, &LDA);
-    map.writeLDA(&LDA);
-    try    w.print("{s}\n", .{map.getParm()});
+    try map.writeLDA(&LDA);
+    Print("{s}\n", .{map.getParm()});
 
-    std.debug.print("lecture first  2 fin\r\n", .{});
-    buf = [_]u8{0} ** 3;
-    _ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
-
+    WriteAll("lecture first  2 fin\r\n");
+    Pause();
+    
     // caller program  spanwait
-    try mdl.callPgmPid("SH", "Pecho", map.getParm());
+    try mdl.callPgmPid("SH", "Pecho", map.getParm(),true);
     // retrive group datarea
-    try    w.print("lecture retour first 3 fin\r\n", .{});
-    LDA = map.readLDA();
+    WriteAll("lecture retour first 3 fin\r\n");
+    LDA = try map.readLDA();
     UDS = ldaToUDS(LDA);
     if (LDA.reply == true) {
-        try    w.print("\n LDA.user  {s}", .{LDA.user});
-        try    w.print("\n LDA.Init  {s}", .{LDA.init});
-        try    w.print("\n LDA.Echo  {s}", .{LDA.echo});
-        try    w.print("\n LDA.reply {}",  .{LDA.reply});
-        try    w.print("\n LDA.abort {}",  .{LDA.abort});
-        try    w.print("\n LDA.zua1  {s}", .{UDS.zua1});
-        try    w.print("\n LDA.zua2  {s}", .{UDS.zua2});
-        try    w.print("\n LDA.zua3  {s}", .{UDS.zua3});
-        try    w.print("\n LDA.zua4  {s}", .{UDS.zua4});
-        try    w.print("\n LDA.zun1  {s}", .{UDS.zun1});
-        try    w.print("\n LDA.zun2  {s}", .{UDS.zun2});
-        try    w.print("\n LDA.zun3  {s}", .{UDS.zun3});
-        try    w.print("\n LDA.zun4  {s}", .{UDS.zun4});
-        try    w.print("\n LDA.zun5  {s}", .{UDS.zun5});
-        try    w.print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
-    } else try    w.print("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
+        Print("\n LDA.user  {s}", .{LDA.user});
+        Print("\n LDA.Init  {s}", .{LDA.init});
+        Print("\n LDA.Echo  {s}", .{LDA.echo});
+        Print("\n LDA.reply {}",  .{LDA.reply});
+        Print("\n LDA.abort {}",  .{LDA.abort});
+        Print("\n LDA.zua1  {s}", .{UDS.zua1});
+        Print("\n LDA.zua2  {s}", .{UDS.zua2});
+        Print("\n LDA.zua3  {s}", .{UDS.zua3});
+        Print("\n LDA.zua4  {s}", .{UDS.zua4});
+        Print("\n LDA.zun1  {s}", .{UDS.zun1});
+        Print("\n LDA.zun2  {s}", .{UDS.zun2});
+        Print("\n LDA.zun3  {s}", .{UDS.zun3});
+        Print("\n LDA.zun4  {s}", .{UDS.zun4});
+        Print("\n LDA.zun5  {s}", .{UDS.zun5});
+        Print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
+    } else  Print("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
     // work end code ...
 
     // LDA = undefined;
 
-    try    w.print("stop 4 fin\r\n", .{});
-    buf = [_]u8{0} ** 3;
-    _ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
+    WriteAll("stop 4 fin\r\n");
+    Pause();
 
+    
     map.savEnvMmap() ;
 
     LDA = undefined;
@@ -224,83 +243,85 @@ pub fn main() !void {
     UDS.zua2 = "deuxiemme test";
     // transmit the request
     udsToLDA(UDS, &LDA);
-    map.writeLDA(&LDA);
+    try map.writeLDA(&LDA);
     std.debug.print("lecture new  5 fin\r\n", .{});
-        try    w.print("\n LDA.user  {s}", .{LDA.user});
-        try    w.print("\n LDA.Init  {s}", .{LDA.init});
-        try    w.print("\n LDA.Echo  {s}", .{LDA.echo});
-        try    w.print("\n LDA.reply {}",  .{LDA.reply});
-        try    w.print("\n LDA.abort {}",  .{LDA.abort});
-        try    w.print("\n LDA.zua1  {s}", .{UDS.zua1});
-        try    w.print("\n LDA.zua2  {s}", .{UDS.zua2});
-        try    w.print("\n LDA.zua3  {s}", .{UDS.zua3});
-        try    w.print("\n LDA.zua4  {s}", .{UDS.zua4});
-        try    w.print("\n LDA.zun1  {s}", .{UDS.zun1});
-        try    w.print("\n LDA.zun2  {s}", .{UDS.zun2});
-        try    w.print("\n LDA.zun3  {s}", .{UDS.zun3});
-        try    w.print("\n LDA.zun4  {s}", .{UDS.zun4});
-        try    w.print("\n LDA.zun5  {s}", .{UDS.zun5});
-        try    w.print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
+        Print("\n LDA.user  {s}", .{LDA.user});
+        Print("\n LDA.Init  {s}", .{LDA.init});
+        Print("\n LDA.Echo  {s}", .{LDA.echo});
+        Print("\n LDA.reply {}",  .{LDA.reply});
+        Print("\n LDA.abort {}",  .{LDA.abort});
+        Print("\n LDA.zua1  {s}", .{UDS.zua1});
+        Print("\n LDA.zua2  {s}", .{UDS.zua2});
+        Print("\n LDA.zua3  {s}", .{UDS.zua3});
+        Print("\n LDA.zua4  {s}", .{UDS.zua4});
+        Print("\n LDA.zun1  {s}", .{UDS.zun1});
+        Print("\n LDA.zun2  {s}", .{UDS.zun2});
+        Print("\n LDA.zun3  {s}", .{UDS.zun3});
+        Print("\n LDA.zun4  {s}", .{UDS.zun4});
+        Print("\n LDA.zun5  {s}", .{UDS.zun5});
+        Print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
     // print("{s}\n", .{map.getParm()});
 
-    try    w.print(" start new  3\r\n", .{});
+    WriteAll(" start new  3\r\n");
     // caller program  spanwait
-    try mdl.callPgmPid("SH", "Pecho", map.getParm());
-        try    w.print("start new 4 fin\r\n", .{});
-    buf = [_]u8{0} ** 3;
-    _ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
+    try mdl.callPgmPid("SH", "Pecho", map.getParm(),true);
+
+    WriteAll("start new 4 fin\r\n");
+    Pause();
+
     // retrive group datarea
-    LDA = map.readLDA();
+    LDA = try map.readLDA();
     UDS = ldaToUDS(LDA);
     if (LDA.reply == true) {
-        try    w.print("\n LDA.user  {s}", .{LDA.user});
-        try    w.print("\n LDA.Init  {s}", .{LDA.init});
-        try    w.print("\n LDA.Echo  {s}", .{LDA.echo});
-        try    w.print("\n LDA.reply {}",  .{LDA.reply});
-        try    w.print("\n LDA.abort {}",  .{LDA.abort});
-        try    w.print("\n LDA.zua1  {s}", .{UDS.zua1});
-        try    w.print("\n LDA.zua2  {s}", .{UDS.zua2});
-        try    w.print("\n LDA.zua3  {s}", .{UDS.zua3});
-        try    w.print("\n LDA.zua4  {s}", .{UDS.zua4});
-        try    w.print("\n LDA.zun1  {s}", .{UDS.zun1});
-        try    w.print("\n LDA.zun2  {s}", .{UDS.zun2});
-        try    w.print("\n LDA.zun3  {s}", .{UDS.zun3});
-        try    w.print("\n LDA.zun4  {s}", .{UDS.zun4});
-        try    w.print("\n LDA.zun5  {s}", .{UDS.zun5});
-        try    w.print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
-    } else try    w.print("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
+        Print("\n LDA.user  {s}", .{LDA.user});
+        Print("\n LDA.Init  {s}", .{LDA.init});
+        Print("\n LDA.Echo  {s}", .{LDA.echo});
+        Print("\n LDA.reply {}",  .{LDA.reply});
+        Print("\n LDA.abort {}",  .{LDA.abort});
+        Print("\n LDA.zua1  {s}", .{UDS.zua1});
+        Print("\n LDA.zua2  {s}", .{UDS.zua2});
+        Print("\n LDA.zua3  {s}", .{UDS.zua3});
+        Print("\n LDA.zua4  {s}", .{UDS.zua4});
+        Print("\n LDA.zun1  {s}", .{UDS.zun1});
+        Print("\n LDA.zun2  {s}", .{UDS.zun2});
+        Print("\n LDA.zun3  {s}", .{UDS.zun3});
+        Print("\n LDA.zun4  {s}", .{UDS.zun4});
+        Print("\n LDA.zun5  {s}", .{UDS.zun5});
+        Print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
+    } else Print("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
     // work end code ...
 
-        try    w.print("lecture retour new 5\r\n", .{});
-    buf = [_]u8{0} ** 3;
-    _ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
+    WriteAll("lecture retour new 5\r\n");
+    Pause();
 
+
+    
     map.rstEnvMmap();
     // end communication
     // retrive group datarea
-    try    w.print("lecture retour first 6\r\n", .{});
-    LDA = map.readLDA();
+    WriteAll("lecture retour first 6\r\n");
+    LDA = try map.readLDA();
     UDS = ldaToUDS(LDA);
     if (LDA.reply == true) {
-        try    w.print("\n LDA.user  {s}", .{LDA.user});
-        try    w.print("\n LDA.Init  {s}", .{LDA.init});
-        try    w.print("\n LDA.Echo  {s}", .{LDA.echo});
-        try    w.print("\n LDA.reply {}",  .{LDA.reply});
-        try    w.print("\n LDA.abort {}",  .{LDA.abort});
-        try    w.print("\n LDA.zua1  {s}", .{UDS.zua1});
-        try    w.print("\n LDA.zua2  {s}", .{UDS.zua2});
-        try    w.print("\n LDA.zua3  {s}", .{UDS.zua3});
-        try    w.print("\n LDA.zua4  {s}", .{UDS.zua4});
-        try    w.print("\n LDA.zun1  {s}", .{UDS.zun1});
-        try    w.print("\n LDA.zun2  {s}", .{UDS.zun2});
-        try    w.print("\n LDA.zun3  {s}", .{UDS.zun3});
-        try    w.print("\n LDA.zun4  {s}", .{UDS.zun4});
-        try    w.print("\n LDA.zun5  {s}", .{UDS.zun5});
-        try    w.print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
-    } else try    w.print("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
+        Print("\n LDA.user  {s}", .{LDA.user});
+        Print("\n LDA.Init  {s}", .{LDA.init});
+        Print("\n LDA.Echo  {s}", .{LDA.echo});
+        Print("\n LDA.reply {}",  .{LDA.reply});
+        Print("\n LDA.abort {}",  .{LDA.abort});
+        Print("\n LDA.zua1  {s}", .{UDS.zua1});
+        Print("\n LDA.zua2  {s}", .{UDS.zua2});
+        Print("\n LDA.zua3  {s}", .{UDS.zua3});
+        Print("\n LDA.zua4  {s}", .{UDS.zua4});
+        Print("\n LDA.zun1  {s}", .{UDS.zun1});
+        Print("\n LDA.zun2  {s}", .{UDS.zun2});
+        Print("\n LDA.zun3  {s}", .{UDS.zun3});
+        Print("\n LDA.zun4  {s}", .{UDS.zun4});
+        Print("\n LDA.zun5  {s}", .{UDS.zun5});
+        Print("\n UDS.zcomit {}\n",  .{UDS.zcomit});
+    } else Print("\n\n\nLDA.reply : {} not found request ", .{LDA.reply});
     // end communication
     map.released();
-    try    w.print("stop fin\r\n", .{});
-    buf = [_]u8{0} ** 3;
-    _ = try stdin.readUntilDelimiterOrEof(buf[0..], '\n');
+    WriteAll("stop fin\r\n");
+    Pause();
+
 }

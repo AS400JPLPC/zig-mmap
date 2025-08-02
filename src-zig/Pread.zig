@@ -4,8 +4,7 @@
 const std = @import("std");
 
 const map = @import("zmmap");
-
-
+const mdl = @import("callpgm");
 
 var out = std.fs.File.stdout().writerStreaming(&.{});
 pub inline fn Print( comptime format: []const u8, args: anytype) void {
@@ -146,61 +145,63 @@ pub const ErrorTest = error{
 
 
 pub fn main() !void {
-    WriteAll("\r\nPecho.txt");
-    WriteAll("\r\nBegin\n");
-
+    WriteAll("\r\nPread");
+   // initialisation communication
+    var UDS = initUDS();
+    var LDA = map.masterMmap() catch @panic("erreur system zmmap");
     getPgmArgs();
-    Print("\r\nnParm {d}\n",.{nParm});
     
-    var UDS : COMUDS =initUDS();
-if (nParm == 2 ) {
-
-
 // for Test for error recovery and visibility  
 // if ( nParm > 0) return ErrorTest.Testcontrol_errror;
+    // parametrage  UDS
+    LDA.init  = pgmName ; // programme Master
+    LDA.reply = false;
+    LDA.abort = false;
+    UDS.zua1  = "bonjour";
+    UDS.zua2  = "Nom";
+    UDS.zun5  = "0";
+    UDS.zu8   = 1;
+    UDS.zcomit  = false;
+    udsToLDA(UDS, &LDA);
+    try map.writeLDA(&LDA);
 
+    // We call the program and take over immediately. "spwan no wait
+    mdl.callPgmPid("SH", "Preply", map.getParm(),false) 
+                            catch |err| std.debug.panic("err: {any}",.{err});
 
-    Print("\r\nParm {s}\n",.{pgmPARM});
-    Pause();    
-    WriteAll("\r\nechoMmap\n");
-    var LDA = map.echoMmap(pgmPARM) 
-                catch | err| {
-                const s = @src();
-                map.Perror(std.fmt.allocPrint(allocUDS,
-                "\n\n\r file:{s} line:{d} column:{d} func:{s}  err:{})\n\r"
-                ,.{s.file, s.line, s.column,s.fn_name,err})
-                 catch unreachable);
-                    };
-    WriteAll("\r\nreadLDA");  
-    LDA = try map.readLDA();
-    LDA.abort = true;
-    UDS = ldaToUDS(LDA);
-        WriteAll("\r\nTest emolation traitement de la LDA"); Pause(); 
-        Print("\r\nLDA.user  {s}", .{LDA.user});
-        Print("\r\nLDA.Init  {s}", .{LDA.init});
-        Print("\r\nLDA.Echo  {s}", .{LDA.echo});
-        Print("\r\nLDA.reply {}",  .{LDA.reply});
-        Print("\r\nLDA.abort {}",  .{LDA.abort});
-        Print("\r\nLDA.zua1  {s}", .{UDS.zua1});
-        Print("\r\nLDA.zua2  {s}", .{UDS.zua2});
-        Print("\r\nLDA.zua3  {s}", .{UDS.zua3});
-        Print("\r\nLDA.zua5  {s}", .{UDS.zua5});
-        Print("\r\nLDA.zun5  {s}", .{UDS.zun5});
+    // Recover the process and don't forget to do kill at the end of the process.                       
+    const process = mdl.getProcess();
+                 
+    while (!LDA.abort ) {
+        while ( true)  {
+            std.posix.nanosleep(0,1_000);
+            if ( map.islock() ) break;
+        }
 
-        
- WriteAll("\r\nlook in qtemp for files\n");Pause();
+        LDA = try map.readLDA();
+        UDS = ldaToUDS(LDA);
+        if ( LDA.reply) {
+            Print("\r\nLDA.user  {s}", .{LDA.user});
+            Print("\r\nLDA.Init  {s}", .{LDA.init});
+            Print("\r\nLDA.Echo  {s}", .{LDA.echo});
+            Print("\r\nLDA.reply {}",  .{LDA.reply});
+            Print("\r\nLDA.abort {}",  .{LDA.abort});
+            Print("\r\nLDA.zua1  {s}", .{UDS.zua1});
+            Print("\r\nLDA.zua2  {s}", .{UDS.zua2});
+            Print("\r\nLDA.zua3  {s}", .{UDS.zua3});
+            Print("\r\nLDA.zun5  {s}", .{UDS.zun5});
+            Print("\r\nLDA.zu8   {d}", .{UDS.zu8});
+         }
+        if ( !LDA.abort) {
+                LDA.reply = false;
+                udsToLDA(UDS, &LDA);
+                try map.writeLDA(&LDA);
+                map.unlock();
+        }
 
- WriteAll("\r\nreleased()\n");
-      map.released();
-WriteAll("\r\nlook in qtemp the files are deleted\n");Pause();
- WriteAll("\r\nEnd Pecho\n"); Pause();
-   
-
-    } else {
-        // work traitement
-
-        // end traitement
     }
-
- 
+    map.released();
+    // If you forget to press “kill”, the process remains Zombie until the end of your program.
+    _ = std.process.Child.kill(process) catch unreachable ;
+    Pause();
 }

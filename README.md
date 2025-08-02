@@ -1,19 +1,23 @@
+**Attention ZIG  0.15.dev   incompatible avec  0.14.1 **
+
+
+
 I present to you ZMMAP, a utilization of MMAP with Zig.
 
 First, let me talk about \*LDA, a function available with IBM's OS AS400. It's a "Local Data Area" that allows for freely defining a structured type for communication with another entity, such as 2 programs or jobs.  
   
 Typically, in an enterprise, we define a structure covering a very wide common spectrum. So, to understand it well, we have a CRYPTO module, a CALLPGM module, an MMAP module, and a UDS structure (Unified Data Structure, referencing IBM).  
   
-MMAP:  
+**MMAP:**  
 A memory space with a record like a file, providing ultra-fast access. The commonly acknowledged issue is the confidential insecurity of the document. That's why I'm using Zig's cryptography, referencing aes\_gcm.zig.  
-  
-CALLPGM:  
+**  
+CALLPGM**:  
 A module that allows calling another independent process using the function std.ChildProcess.spawnAndWait, enabling modular programming.  
   
-CRYPTO:  
+**CRYPTO**:  
 won't discuss the cryptographic module. It's a copy I took from the master of "Zig-lang" and adapted where only the data is taken into account. For more information, please visit the "Zig-lang" website.
 
-Process :
+**Process** :
 
 The master program needs to retrieve a key, for example, the customer number during an order taking process. The customer file is maintained by the accounting department, so it will request it from the "visu" program, which will either send back the customer number or indicate that it cannot fulfill the request.  
   
@@ -37,7 +41,7 @@ Often in discussions on forums related to C/C++ or other languages, the issue of
   
 The LDA consists of two parts, hence two files:
 
-LOG:
+LCI: local communication internal
 
 *   •reply = yes, I respond to the request or no, I haven't found it. 
     
@@ -192,18 +196,424 @@ This process appears to be an organized way of managing interactions between dif
 <BR />
 <BR />
 
-*   •upgrade 2024-03-23.<BR /> 
-&nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version    0.12.0-dev.3429+13a9d94a8<BR /> 
+<BR />
 
-*   •2024-03-25.<BR /> 
-&nbsp;&nbsp;&nbsp;&larr;&nbsp; test  Pcall&nbsp;&nbsp;&nbsp;Pmaitre<BR /> 
+TEST COMPLEX  child suspend not wait:  
+<BR />
+**maitre**:<BR />
+  
+```  
+  
+///-----------------------
+/// prog echo
+///-----------------------
+const std = @import("std");
+
+const map = @import("zmmap");
+const mdl = @import("callpgm");
+
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+ }
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+ }
+fn Pause() void{
+
+    WriteAll("\nPause\r\n");
+var stdin = std.fs.File.stdin();
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
+//============================================================================================
+//-------------------------------
+// datarea communication 
+//-------------------------------
+const COMUDS = struct { 
+    // alpha numeric
+    zua1 : [] const u8 ,
+    zua2 : [] const u8 ,
+    zua3 : [] const u8 ,
+    zua4 : [] const u8 ,
+    zua5 : [] const u8 ,
+
+    // numérique
+    zun1 : [] const u8 ,
+    zun2 : [] const u8 ,
+    zun3 : [] const u8 ,
+    zun4 : [] const u8 ,
+    zun5 : [] const u8 ,
+
+    zu8  : u8,
+    zcomit: bool,
+
+};
 
 
-*   •upgrade  2024-05-29.<BR />
-&nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version    0.13.0<BR /> 
+fn initUDS() COMUDS {
 
-*   •upgrade  2024-08-12.<BR />
-&nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version    0.13.0 / 0.14  -->  Token<BR /> 
+    const vuds = COMUDS{
+        .zua1 = "",
+        .zua2 = "",
+        .zua3 = "",
+        .zua4 = "",
+        .zua5 = "",
+        
+        .zun1 = "",
+        .zun2 = "",
+        .zun3 = "",
+        .zun4 = "",
+        .zun5 = "",
+        .zu8 = 0,
+        .zcomit = true
+    };
+    return vuds ;
+}
+const allocUDS = std.heap.page_allocator;
 
-*   •upgrade  2024-09-01.<BR />
-&nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version   0.14  -->  Token<BR /> 
+
+// write  UDS to LDA 
+fn udsToLDA(vUDS: COMUDS,vLDA: *map.COMLDA) void {
+
+    vLDA.zuds = std.fmt.allocPrint(allocUDS,
+        "{s}|{s}|{s}|{s}|{s}|{s}|{s}|{s}|{s}|{s}|{d}|{}"
+        ,.{
+            // alpha numeric
+            vUDS.zua1,
+            vUDS.zua2,
+            vUDS.zua3,
+            vUDS.zua4,
+            vUDS.zua5,
+            // numérique
+            vUDS.zun1,
+            vUDS.zun2,
+            vUDS.zun3,
+            vUDS.zun4,
+            vUDS.zun5,
+            // other for test
+            vUDS.zu8,
+            vUDS.zcomit,
+        }) catch unreachable;
+}
+
+// read LDA to UDS
+fn ldaToUDS(vlda: map.COMLDA) COMUDS {
+
+    var vuds : COMUDS = undefined;
+    var it = std.mem.splitScalar(u8, vlda.zuds[0..], '|');
+    var i : usize = 0;
+    while (it.next()) |chunk| :( i += 1) {
+            switch(i) {
+            0  => vuds.zua1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            1  => vuds.zua2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            2  => vuds.zua3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            3  => vuds.zua4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            4  => vuds.zua5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            5  => vuds.zun1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            6  => vuds.zun2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            7  => vuds.zun3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            8  => vuds.zun4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            9  => vuds.zun5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            10 => vuds.zu8  = std.fmt.parseInt(u8,chunk,10) catch unreachable,
+            11 =>{    if (std.mem.eql(u8,chunk, "true")) vuds.zcomit = true
+                    else  vuds.zcomit = false;
+            },
+            else => continue,
+        }
+    }
+    return vuds;
+}
+
+var pgmName : []const u8 = undefined;
+var pgmPARM : []const u8 = undefined;
+var nParm : usize = 0;
+
+// const err = error.AccessDenied;
+
+fn getPgmArgs() void {
+    var args_it = try std.process.ArgIterator.initWithAllocator(allocUDS);
+    defer args_it.deinit();
+        while(args_it.next()) |arg|  {
+        nParm += 1;
+        if(nParm == 1) pgmName = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
+        if(nParm == 2) pgmPARM = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
+        } 
+}
+
+
+pub const ErrorTest = error{
+    Testcontrol_errror,
+};
+
+
+pub fn main() !void {
+    WriteAll("\r\nPread");
+   // initialisation communication
+    var UDS = initUDS();
+    var LDA = map.masterMmap() catch @panic("erreur system zmmap");
+    getPgmArgs();
+    
+// for Test for error recovery and visibility  
+// if ( nParm > 0) return ErrorTest.Testcontrol_errror;
+    // parametrage  UDS
+    LDA.init  = pgmName ; // programme Master
+    LDA.reply = false;
+    LDA.abort = false;
+    UDS.zua1  = "bonjour";
+    UDS.zua2  = "Nom";
+    UDS.zun5  = "0";
+    UDS.zu8   = 1;
+    UDS.zcomit  = false;
+    udsToLDA(UDS, &LDA);
+    try map.writeLDA(&LDA);
+
+    // We call the program and take over immediately. "spwan no wait
+    mdl.callPgmPid("SH", "Preply", map.getParm(),false) 
+                            catch |err| std.debug.panic("err: {any}",.{err});
+
+    // Recover the process and don't forget to do kill at the end of the process.                       
+    const process = mdl.getProcess();
+                 
+    while (!LDA.abort ) {
+        while ( true)  {
+            std.posix.nanosleep(0,1_000);
+            if ( map.islock() ) break;
+        }
+
+        LDA = try map.readLDA();
+        UDS = ldaToUDS(LDA);
+        if ( LDA.reply) {
+            Print("\r\nLDA.user  {s}", .{LDA.user});
+            Print("\r\nLDA.Init  {s}", .{LDA.init});
+            Print("\r\nLDA.Echo  {s}", .{LDA.echo});
+            Print("\r\nLDA.reply {}",  .{LDA.reply});
+            Print("\r\nLDA.abort {}",  .{LDA.abort});
+            Print("\r\nLDA.zua1  {s}", .{UDS.zua1});
+            Print("\r\nLDA.zua2  {s}", .{UDS.zua2});
+            Print("\r\nLDA.zua3  {s}", .{UDS.zua3});
+            Print("\r\nLDA.zun5  {s}", .{UDS.zun5});
+            Print("\r\nLDA.zu8   {d}", .{UDS.zu8});
+         }
+        if ( !LDA.abort) {
+                LDA.reply = false;
+                udsToLDA(UDS, &LDA);
+                try map.writeLDA(&LDA);
+                map.unlock();
+        }
+
+    }
+    map.released();
+    // If you forget to press “kill”, the process remains Zombie until the end of your program.
+    _ = std.process.Child.kill(process) catch unreachable ;
+    Pause();
+}
+  
+```  
+  
+<BR />
+**child:**<BR />
+  
+```  
+  
+
+///-----------------------
+/// prog echo
+///-----------------------
+const std = @import("std");
+
+const map = @import("zmmap");
+
+
+//============================================================================================
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+ }
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+ }
+fn Pause() void{
+
+    WriteAll("\nPause\r\n");
+var stdin = std.fs.File.stdin();
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
+//============================================================================================
+//-------------------------------
+// datarea communication 
+//-------------------------------
+const COMUDS = struct { 
+    // alpha numeric
+    zua1 : [] const u8 ,
+    zua2 : [] const u8 ,
+    zua3 : [] const u8 ,
+    zua4 : [] const u8 ,
+    zua5 : [] const u8 ,
+
+    // numérique
+    zun1 : [] const u8 ,
+    zun2 : [] const u8 ,
+    zun3 : [] const u8 ,
+    zun4 : [] const u8 ,
+    zun5 : [] const u8 ,
+
+    zu8  : u8,
+    zcomit: bool,
+
+};
+
+
+fn initUDS() COMUDS {
+
+    const vuds = COMUDS{
+        .zua1 = "",
+        .zua2 = "",
+        .zua3 = "",
+        .zua4 = "",
+        .zua5 = "",
+        
+        .zun1 = "",
+        .zun2 = "",
+        .zun3 = "",
+        .zun4 = "",
+        .zun5 = "",
+        .zu8 = 0,
+        .zcomit = true
+    };
+    return vuds ;
+}
+const allocUDS = std.heap.page_allocator;
+
+
+// write  UDS to LDA 
+fn udsToLDA(vUDS: COMUDS,vLDA: *map.COMLDA) void {
+
+    vLDA.zuds = std.fmt.allocPrint(allocUDS,
+        "{s}|{s}|{s}|{s}|{s}|{s}|{s}|{s}|{s}|{s}|{d}|{}"
+        ,.{
+            // alpha numeric
+            vUDS.zua1,
+            vUDS.zua2,
+            vUDS.zua3,
+            vUDS.zua4,
+            vUDS.zua5,
+            // numérique
+            vUDS.zun1,
+            vUDS.zun2,
+            vUDS.zun3,
+            vUDS.zun4,
+            vUDS.zun5,
+            // other for test
+            vUDS.zu8,
+            vUDS.zcomit,
+        }) catch unreachable;
+}
+
+// read LDA to UDS
+fn ldaToUDS(vlda: map.COMLDA) COMUDS {
+
+    var vuds : COMUDS = undefined;
+    var it = std.mem.splitScalar(u8, vlda.zuds[0..], '|');
+    var i : usize = 0;
+    while (it.next()) |chunk| :( i += 1) {
+            switch(i) {
+            0  => vuds.zua1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            1  => vuds.zua2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            2  => vuds.zua3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            3  => vuds.zua4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            4  => vuds.zua5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            5  => vuds.zun1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            6  => vuds.zun2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            7  => vuds.zun3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            8  => vuds.zun4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            9  => vuds.zun5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            10 => vuds.zu8  = std.fmt.parseInt(u8,chunk,10) catch unreachable,
+            11 =>{    if (std.mem.eql(u8,chunk, "true")) vuds.zcomit = true
+                    else  vuds.zcomit = false;
+            },
+            else => continue,
+        }
+    }
+    return vuds;
+}
+
+var pgmName : []const u8 = undefined;
+var pgmPARM : []const u8 = undefined;
+var nParm : usize = 0;
+
+// const err = error.AccessDenied;
+
+fn getPgmArgs() void {
+    var args_it = try std.process.ArgIterator.initWithAllocator(allocUDS);
+    defer args_it.deinit();
+        while(args_it.next()) |arg|  {
+        nParm += 1;
+        if(nParm == 1) pgmName = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
+        if(nParm == 2) pgmPARM = std.fmt.allocPrint(allocUDS,"{s}",.{arg}) catch unreachable;
+        } 
+}
+
+
+pub const ErrorTest = error{
+    Testcontrol_errror,
+};
+
+
+pub fn main() !void {
+
+    getPgmArgs();
+    
+    var UDS : COMUDS =initUDS();
+if (nParm != 2 ) return ErrorTest.Testcontrol_errror;
+
+var zun5 : i32 = 0;
+var buf: [256]u8 = undefined;
+var LDA = map.echoMmap(pgmPARM) 
+            catch | err| {
+            const s = @src();
+            map.Perror(std.fmt.allocPrint(allocUDS,
+            "\n\n\r file:{s} line:{d} column:{d} func:{s}  err:{})\n\r"
+            ,.{s.file, s.line, s.column,s.fn_name,err})
+             catch unreachable);
+                };
+ LDA = try map.readLDA();
+ UDS = ldaToUDS(LDA);
+            
+    while (!LDA.abort) {
+        
+        if (LDA.reply == false) { 
+
+            zun5 = try std.fmt.parseInt(i32, UDS.zun5, 10);
+            zun5 += @intCast(UDS.zu8);
+            buf = undefined;
+            UDS.zun5  = std.fmt.bufPrintZ(&buf, "{}", .{zun5}) catch unreachable;
+            LDA.reply = true;
+            if ( zun5 == 10000) { UDS.zcomit = true; LDA.abort = true ;}
+            udsToLDA(UDS, &LDA);
+            try map.writeLDA(&LDA);
+            map.lock();
+        }
+        if (!LDA.abort) {
+            while ( true )  {
+                std.posix.nanosleep(0,1_000);
+                if ( !map.islock() ) break;            
+            }
+            LDA = try map.readLDA();
+            UDS = ldaToUDS(LDA);
+        }    
+    } 
+}
+  
+```  
+  
+*   •upgrade  2025-08-01.<BR />
+&nbsp;&nbsp;&nbsp;&larr;&nbsp;zig version   0.15.dev  -->  Token<BR /> 
+

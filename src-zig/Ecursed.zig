@@ -56,7 +56,23 @@ const utl = @import("utils");
 const reg = @import("mvzr");
 
 
+var out = std.fs.File.stdout().writerStreaming(&.{});
+pub inline fn Print( comptime format: []const u8, args: anytype) void {
+    out.interface.print(format, args) catch return;
+ }
+pub inline fn WriteAll( args: anytype) void {
+    out.interface.writeAll(args) catch return;
+ }
+fn Pause() void{
 
+    WriteAll("\nPause\r\n");
+var stdin = std.fs.File.stdin();
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
 
 /// Errors 
 pub const Error = error{
@@ -688,16 +704,16 @@ fn ldaToUDS(vlda: map.COMLDA) COMUDS {
     var i : usize = 0;
     while (it.next()) |chunk| :( i += 1) {
             switch(i) {
-            0  => vuds.zua1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            1  => vuds.zua2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            2  => vuds.zua3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            3  => vuds.zua4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            4  => vuds.zua5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            5  => vuds.zun1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            6  => vuds.zun2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            7  => vuds.zun3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            8  => vuds.zun4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            9  => vuds.zun5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
+            0  => vuds.zua1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            1  => vuds.zua2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            2  => vuds.zua3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            3  => vuds.zua4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            4  => vuds.zua5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            5  => vuds.zun1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            6  => vuds.zun2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            7  => vuds.zun3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            8  => vuds.zun4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            9  => vuds.zun5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
             10 => vuds.zu8  = std.fmt.parseInt(u8,chunk,10) catch unreachable,
             11 =>{    if (std.mem.eql(u8,chunk, "true")) vuds.zcomit = true
                     else  vuds.zcomit = false;
@@ -747,6 +763,49 @@ pub fn main() !void {
     // work Panel-01
     term.resizeTerm(pFmt01.lines,pFmt01.cols);
 
+
+//--------------------
+// get Name Programme
+// get Args Key Times
+// initialisation communication
+//-------------------
+    getPgmArgs();
+
+if (nParm == 2 ) {
+    WriteAll("\r\nEcursed\n");
+    var UDS =initUDS();
+    var LDA = map.echoMmap(pgmPARM) 
+                catch  @panic(" error readMmap  not init communication call service informatique");
+    WriteAll("\r\nechoMmap\n");
+    LDA = try map.readLDA();
+    UDS = ldaToUDS(LDA);
+    WriteAll("\r\nreadLDA\n");
+    fld.setText(pFmt01,try fld.getIndex(pFmt01,"udecimal"),UDS.zun5) catch unreachable ;
+
+
+
+    // work traitement
+    // -------
+    // end traitement
+    
+    LDA.echo  = pgmName;
+    LDA.reply = true;
+    UDS.zua1  = "j'ai bien reçu votre message";
+    UDS.zua3  = "Jean-Pierre";
+    UDS.zun5  = "0";
+    UDS.zu8   = 50;
+    UDS.zcomit = true;
+
+    
+
+
+
+    udsToLDA(UDS, &LDA);
+    // send group datarea
+    try map.writeLDA(&LDA);
+    
+
+}
 
     while (true) {
         // clean works
@@ -887,47 +946,5 @@ pub fn main() !void {
         }
         if (Tkey.Key == kbd.F3) break; // end work
     }
-
-    //--------------------
-// get Name Programme
-// get Args Key Times
-// initialisation communication
-//-------------------
-
-    getPgmArgs();
-
-if (nParm == 2 ) {
-    var UDS =initUDS();
-    var LDA = map.echoMmap(pgmPARM) 
-                catch  @panic(" error readMmap  not init communication call service informatique");
-
-    LDA = map.readLDA();
-    UDS = ldaToUDS(LDA);
-
-
-
-
-    // work traitement
-    // -------
-    // end traitement
-    
-    LDA.echo  = pgmName;
-    LDA.reply = true;
-    UDS.zua1  = "j'ai bien reçu votre message";
-    UDS.zua3  = "Jean-Pierre";
-    UDS.zun5  = "0";
-    UDS.zu8   = 50;
-    UDS.zcomit = true;
-
-    
-
-
-
-    udsToLDA(UDS, &LDA);
-    // send group datarea
-    map.writeLDA(&LDA);
-    
-
-}
 
 }

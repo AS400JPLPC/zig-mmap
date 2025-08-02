@@ -154,8 +154,8 @@ const T = struct {
 
     try printPack(self,Xtype);
 
-    var out = std.ArrayList(u8).init(allocator);
-    defer out.deinit();
+    // var out = std.ArrayList(u8).init(allocator);
+    // defer out.deinit();
 
     switch (self.x.?) {
       .null => {
@@ -218,16 +218,16 @@ const T = struct {
 
   pub fn printPack(self: T , Xtype : Ctype) !void {
 
-    std.debug.print("{}:",.{Xtype});
-
-
-    var out = std.ArrayList(u8).init(allocator);
-    defer out.deinit();
+    std.debug.print("Pack{}:",.{Xtype});
     const i = self.x.?;
-    const P = struct { value: ?std.json.Value };
-    try std.json.stringify(P{ .value = i }, .{ }, out.writer());
-    std.debug.print("{s}\n", .{ out.items });
+    if ( Xtype == Ctype.array or Xtype == Ctype.object) return;
+      if ( Xtype == Ctype.string) {  
+                  const str = try std.fmt.allocPrint(allocator,"{s}",.{self.x.?.string});
+                  std.debug.print("{s}\n",.{str});
+      }
+                else    std.debug.print("{any}\n",.{i});
   }
+  
 };
 
 
@@ -504,12 +504,18 @@ fn strToUsize_01(str: []const u8) usize{
 pub fn main() !void {
   
 
-    var out_buf: [1024]u8 = undefined;
-    var slice_stream = std.io.fixedBufferStream(&out_buf);
-    const out = slice_stream.writer();
+    // var out_buf: [1024]u8 = undefined;
+    // var slice_stream = std.io.fixedBufferStream(&out_buf);
+    // const out = slice_stream.writer();
 
-    var w = std.json.writeStream(out, .{ .whitespace = .indent_2 });
-    defer w.deinit();
+    // var w = std.json.writeStream(out, .{ .whitespace = .indent_2 });
+    // defer w.deinit();
+
+    const out_buffer: []u8 = try allocator.alloc(u8, 2048000);
+    defer allocator.free(out_buffer);
+    var fixed_writer: std.io.Writer = .fixed(out_buffer);
+    var w: std.json.Stringify = .{ .writer = &fixed_writer, .options = .{ .whitespace = .indent_2 }};
+
 
   try w.beginObject();
     try w.objectField("PANEL");
@@ -607,22 +613,23 @@ pub fn main() !void {
     try w.endArray();
   try w.endObject();
 
-    const result = slice_stream.getWritten();
+    // const result = slice_stream.getWritten();
 
     //std.debug.print("{s}\r\n",.{result});
-
+    std.debug.print("{s}\r\n",.{w.writer.buffered()});
     var my_file = try std.fs.cwd().createFile("fileJson.txt", .{ .read = true });
     
 
-    _ = try my_file.write(result);
+    // _ = try my_file.write(result);
+    _ = try my_file.write(w.writer.buffered());
     my_file.close();
 
     my_file = try std.fs.cwd().openFile("fileJson.txt", .{});
     defer my_file.close();
 
 
-      var buf : []u8= allocator.alloc(u8, result.len) catch unreachable ;
-
+      // var buf : []u8= allocator.alloc(u8, result.len) catch unreachable ;
+      var buf : []u8= allocator.alloc(u8, w.writer.buffered().len) catch unreachable ;
       try my_file.seekTo(0);
       _= try my_file.read(buf[0..]);
       std.debug.print("{s}\r\n",.{buf});
@@ -675,7 +682,7 @@ for (ENRG.label.items ) | f|{
   plog(.Label).debug("{}\n",.{f.title});
 }
 
-_= strToUsize_01("test");
+// _= strToUsize_01("test");
 
 plog(.end).debug("End.\n", .{});
 

@@ -56,7 +56,17 @@ const mdl = @import("callpgm");
 pub const Error = error{
     main_function_Enum_invalide,
 };
-
+    
+fn Pause() void{
+var out = std.fs.File.stdout().writerStreaming(&.{});
+    out.interface.writeAll("\nPause\r\n") catch unreachable;
+var stdin = std.fs.File.stdin();
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
 /// ---------------------------------------------------
 /// Exemple defined Panel Label Field Button Menu Grid
 /// ---------------------------------------------------
@@ -554,8 +564,8 @@ pub const FnProg = enum {
         const pgmParm : ?[] const u8 = null;
         switch (self) {
             .Ecursed => {
-                mdl.callPgmPid("APPTERM", vfld.progcall,pgmParm) catch |err| switch (err) {
-                    mdl.ErrChild.Module_Invalid => {
+                mdl.callPgmPid("APPTERM", vfld.progcall,pgmParm,true) catch |err| switch (err) {
+                    mdl.ErrCallpgm.Module_Error => {
                         const msgerr = std.fmt.allocPrint(utl.allocUtl, " module {s} invalide appeller service Informatique ", .{vfld.progcall}) catch unreachable;
                         defer utl.allocUtl.free(msgerr);
                         forms.debeug(9999, msgerr);
@@ -670,17 +680,17 @@ fn ldaToUDS(vlda: map.COMLDA) COMUDS {
     var i : usize = 0;
     while (it.next()) |chunk| :( i += 1) {
             switch(i) {
-            0  => vuds.zua1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            1  => vuds.zua2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            2  => vuds.zua3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            3  => vuds.zua4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            4  => vuds.zua5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
+            0  => vuds.zua1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            1  => vuds.zua2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            2  => vuds.zua3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            3  => vuds.zua4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            4  => vuds.zua5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
             
-            5  => vuds.zun1 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            6  => vuds.zun2 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            7  => vuds.zun3 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            8  => vuds.zun4 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
-            9  => vuds.zun5 = std.fmt.allocPrintZ(allocUDS,"{s}",.{chunk}) catch unreachable,
+            5  => vuds.zun1 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            6  => vuds.zun2 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            7  => vuds.zun3 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            8  => vuds.zun4 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
+            9  => vuds.zun5 = std.fmt.allocPrint(allocUDS,"{s}",.{chunk}) catch unreachable,
             
             10 => vuds.zu8  = std.fmt.parseInt(u8,chunk,10) catch unreachable,
             11 =>{    if (std.mem.eql(u8,chunk, "true")) vuds.zcomit = true
@@ -711,14 +721,11 @@ fn getPgmArgs() void {
 
 // main----------------------------------
 pub fn main() !void {
-    // initialisation communication
-    getPgmArgs();
-    var UDS : COMUDS = initUDS();
-    var LDA : map.COMLDA = undefined;
-    if ( nParm == 2) {
-    LDA = map.masterMmap() catch @panic("erreur system zmmap");
-    map.savEnvMmap() ;
-    }
+
+    // if ( nParm == 2) {
+    // LDA = map.masterMmap() catch @panic("erreur system zmmap");
+    // map.savEnvMmap() ;
+    // }
 
     // open terminal and config and offMouse , cursHide->(cursor hide)
     term.enableRawMode();
@@ -887,43 +894,89 @@ pub fn main() !void {
 // ici on ferme le terminal
 term.disableRawMode();
 // 2 = callpgmid
+    getPgmArgs();
 if ( nParm == 2) {
-    map.rstEnvMmap();
-    // LDA = map.masterMmap() catch @panic("erreur system zmmap");
+    // Recover caller's communication system
+    var UDS : COMUDS = initUDS();
+    var LDA = map.echoMmap(pgmPARM)
+                catch | err| {
+                const s = @src();
+                map.Perror(std.fmt.allocPrint(allocUDS,
+                "\n\n\r file:{s} line:{d} column:{d} func:{s}  err:{}\n\r"
+                ,.{s.file, s.line, s.column,s.fn_name,err})
+                 catch unreachable);
+                    };
+    forms.debeug(2,std.fmt.allocPrint(allocUDS,"Read LDA\n", .{}) catch unreachable);
+
+    LDA = map.readLDA()
+                catch | err| {
+                const s = @src();
+                map.Perror(std.fmt.allocPrint(allocUDS,
+                "\n\n\r file:{s} line:{d} column:{d} func:{s}  err:{}\n\r"
+                ,.{s.file, s.line, s.column,s.fn_name,err})
+                 catch unreachable);
+                    };
+
+
+    forms.debeug(2,std.fmt.allocPrint(allocUDS,"Read LDA end\n", .{}) catch unreachable);
+
+    // save the initial communication
+    map.savEnvMmap() ;
+
+
+
+    
+
+    var workcall:bool = true;
+//--------------------------------------------------------------------------------
+    // we open a new communication
+
+    LDA = undefined;
+    UDS = initUDS();
+    forms.debeug(15,"initUDS\n");
+
+
+    LDA =  map.masterMmap()
+                catch | err| {
+                const s = @src();
+                map.Perror(std.fmt.allocPrint(allocUDS,
+                "\n\n\r file:{s} line:{d} column:{d} func:{s}  err:{}\n\r"
+                ,.{s.file, s.line, s.column,s.fn_name,err})
+                 catch unreachable);
+                    };
+
+    forms.debeug(15,"masterMmap\n");
+    LDA.init = pgmName;
     LDA.init = pgmName;
     UDS.zua1 = "bonjour";
     UDS.zua2 = "Nom";
+    UDS.zua5 = "call Mcursed and parameter";
     UDS.zua3 = "";
-    UDS.zun5 = "123456.0123";
-
-    // transmit the request
+    UDS.zun5 = "0";
     udsToLDA(UDS, &LDA);
-    map.writeLDA(&LDA);
-    
-    // caller program  spanwait
-    try mdl.callPgmPid("SH", "Pecho", map.getParm());
-    // retrive group datarea
-    LDA = map.readLDA();
-    UDS = ldaToUDS(LDA);
-    
-    if (LDA.reply == true) {
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\nLDA.user   {s}", .{LDA.user}) catch unreachable);
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.Init  {s}", .{LDA.init}) catch unreachable);
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.Echo  {s}", .{LDA.echo}) catch unreachable);
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.abort {}",  .{LDA.abort}) catch unreachable);
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
-        forms.debeug(6,std.fmt.allocPrint(allocUDS,"\n LDA.zun5  {s}", .{UDS.zun5}) catch unreachable);
-    } else forms.debeug(6,std.fmt.allocPrint(allocUDS,"\nLDA.reply :{} not found request", .{LDA.reply}) catch unreachable);
-    // work end code ...
+    try map.writeLDA(&LDA);
+   
+    // the message is transmitted to the called program from the calling program
+    mdl.callPgmPid("SH", "Pecho", map.getParm(), true) catch | e | {
+        forms.debeug(999,std.fmt.allocPrint(allocUDS,"Error {}\n", .{e}) catch unreachable);
 
-     forms.debeug(10,"\nsavEnvMmap");
-    map.savEnvMmap() ;
+        // we restore the environment, flag that we don't have to do the LDA treatment
+        // module rstEnvMmap restores environment and deletes communication files
+        map.rstEnvMmap();
+
+        workcall = false;
+    };
+
+    
+    if (workcall) {
+    forms.debeug(20,"New call\n");
+    // Communication initialization
     LDA = undefined;
     UDS = initUDS();
-    LDA = map.masterMmap() catch @panic("erreur system zmmap");
-    forms.debeug(40,"\nwaitMmap");
+    forms.debeug(20,"initUDS()\n");
+    LDA = try map.masterMmap();
+    forms.debeug(20,"masterMmap()\n"); 
+
     LDA.init = pgmName;
     UDS.zua1 = "bonjour";
     UDS.zua2 = "Nom";
@@ -933,62 +986,79 @@ if ( nParm == 2) {
 
     // transmit the request
     udsToLDA(UDS, &LDA);
-    map.writeLDA(&LDA);
+    forms.debeug(30,"udsToLDA\n"); Pause();
+    try map.writeLDA(&LDA) ;
 
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.user  {s}", .{LDA.user}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Init  {s}", .{LDA.init}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Echo  {s}", .{LDA.echo}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply {}",  .{LDA.reply}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abort {}",  .{LDA.abort}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua5  {s}", .{UDS.zua5}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zun5  {s}", .{UDS.zun5}) catch unreachable);
-    forms.debeug(50,"\ncall and flash only test");
-    // caller program  spanwait
-    try mdl.callPgmPid("APPTERM", "Ecursed", map.getParm());
+    //we look at how the structure of the LDA
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.user  {s}\n", .{LDA.user}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.Init  {s}\n", .{LDA.init}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.Echo  {s}\n", .{LDA.echo}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.reply {}\n",  .{LDA.reply}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.abort {}\n",  .{LDA.abort}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.zua1  {s}\n", .{UDS.zua1}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.zua2  {s}\n", .{UDS.zua2}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.zua3  {s}\n", .{UDS.zua3}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.zua5  {s}\n", .{UDS.zua5}) catch unreachable);
+        forms.debeug(60,std.fmt.allocPrint(allocUDS,"LDA.zun5  {s}\n", .{UDS.zun5}) catch unreachable);
+
+
+    forms.debeug(40,std.fmt.allocPrint(allocUDS,"call pgm name {s}\n", .{"Ecursed"}) catch unreachable);
+    // caller new program  spanwait
+    try mdl.callPgmPid("APPTERM", "Ecursed", map.getParm(),true );
     // retrive group datarea
-    LDA = map.readLDA();
+    LDA = try map.readLDA();
     UDS = ldaToUDS(LDA);
 
-    
+
+      forms.debeug(40,std.fmt.allocPrint(allocUDS,"lecture de {s}\n", .{"Ecursed"}) catch unreachable);
     if (LDA.reply == true) {
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.user  {s}", .{LDA.user}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Init  {s}", .{LDA.init}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Echo  {s}", .{LDA.echo}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply {}",  .{LDA.reply}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abort {}",  .{LDA.abort}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua5  {s}", .{UDS.zua5}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zun5  {s}", .{UDS.zun5}) catch unreachable);
-    } else forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply : {} not found request ", .{LDA.reply}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.user  {s}\n", .{LDA.user}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.Init  {s}\n", .{LDA.init}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.Echo  {s}\n", .{LDA.echo}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.reply {}\n",  .{LDA.reply}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.abort {}\n",  .{LDA.abort}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.zua1  {s}\n", .{UDS.zua1}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.zua2  {s}\n", .{UDS.zua2}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.zua3  {s}\n", .{UDS.zua3}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.zua5  {s}\n", .{UDS.zua5}) catch unreachable);
+        forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.zun5  {s}\n", .{UDS.zun5}) catch unreachable);
+    } else forms.debeug(61,std.fmt.allocPrint(allocUDS,"LDA.reply : {} not found request \n", .{LDA.reply}) catch unreachable);
     
+    // on ferm la communication et on recupère la communcation intial
     map.rstEnvMmap();
-    // end communication
+
+    } // end work Pecho
+//--------------------------------------------------------------------------------
+
+
+    
     // retrive group datarea
-    LDA = map.readLDA();
-    UDS = ldaToUDS(LDA);
+    LDA = try map.readLDA();
+    LDA.echo = "End PGM";
+    UDS.zua1 = "";
+    UDS.zua2 = "";
+    UDS.zua3 = "";
+    UDS.zua5 = "";   
+    UDS.zun5 = "";
+    UDS.zu8  = 0; 
+    udsToLDA(UDS, &LDA);
+    try map.writeLDA(&LDA); 
 
-    
+    forms.debeug(99,std.fmt.allocPrint(allocUDS,"test LDA.reply {}\n",  .{LDA.reply}) catch unreachable);
     if (LDA.reply == true) {
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.user  {s}", .{LDA.user}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Init  {s}", .{LDA.init}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.Echo  {s}", .{LDA.echo}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply {}",  .{LDA.reply}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.abort {}",  .{LDA.abort}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua1  {s}", .{UDS.zua1}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua2  {s}", .{UDS.zua2}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua3  {s}", .{UDS.zua3}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zua5  {s}", .{UDS.zua5}) catch unreachable);
-        forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.zun5  {s}", .{UDS.zun5}) catch unreachable);
-    } else forms.debeug(60,std.fmt.allocPrint(allocUDS,"\nLDA.reply : {} not found request ", .{LDA.reply}) catch unreachable);
-    
-    map.released();
-    // end communication
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.user  {s}\n", .{LDA.user}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.Init  {s}\n", .{LDA.init}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.Echo  {s}\n", .{LDA.echo}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.reply {}\n",  .{LDA.reply}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.abort {}\n",  .{LDA.abort}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.zua1  {s}\n", .{UDS.zua1}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.zua2  {s}\n", .{UDS.zua2}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.zua3  {s}\n", .{UDS.zua3}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.zua5  {s}\n", .{UDS.zua5}) catch unreachable);
+        forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.zun5  {s}\n", .{UDS.zun5}) catch unreachable);
+    } else forms.debeug(99,std.fmt.allocPrint(allocUDS,"LDA.reply : {} not found request\n", .{LDA.reply}) catch unreachable);
+    // map.released()  the calling program will do this
 
-    forms.debeug(999,"\nEnd TEST");
+    forms.debeug(999,"End TEST\n");
 }
 }
