@@ -5,10 +5,29 @@
 
 const std = @import("std");
 const cry = @import("crypto");
-pub fn Perror(msg :  [] const u8) noreturn{
-    var out = std.fs.File.stdout().writerStreaming(&.{});
-    out.interface.print("Veuillez corriger  {s}\n",.{msg}) catch unreachable;
+
 var stdin = std.fs.File.stdin();
+var stdout = std.fs.File.stdout().writerStreaming(&.{});
+//=======================================================================
+// For debeug
+inline fn Print( comptime format: []const u8, args: anytype) void {
+    stdout.interface.print(format, .{args}) catch  {} ;
+ }
+inline fn WriteAll( args: [] const u8) void {
+    stdout.interface.writeAll(args) catch  {} ;
+ }
+
+fn Pause() void {
+    stdout.interface.print("Pause \n",.{}) catch  {} ;
+    var buf: [16]u8 =  [_]u8{0} ** 16;
+    var c  : usize = 0;
+    while (c == 0) {
+        c = stdin.read(&buf) catch unreachable;
+    }
+}
+// return error
+pub fn Perror(msg :  [] const u8) noreturn{
+    stdout.interface.print("please fix:  {s}\n",.{msg}) catch unreachable;
     var buf: [16]u8 =  [_]u8{0} ** 16;
     var c  : usize = 0;
     while (c == 0) {
@@ -16,29 +35,6 @@ var stdin = std.fs.File.stdin();
     }
  @panic(msg);
 }
-
-
-//=======================================================================
-// For debeug
-pub inline fn Print( comptime format: []const u8, args: anytype) void {
-    var out = std.fs.File.stdout().writerStreaming(&.{});
-    out.interface.print(format, .{args}) catch return;
- }
-pub inline fn WriteAll( args: [] const u8) void {
-    var out = std.fs.File.stdout().writerStreaming(&.{});
-    out.interface.writeAll(args) catch return;
- }
-pub fn Pause() void {
-    var out = std.fs.File.stdout().writerStreaming(&.{});
-    out.interface.print("iPause \n",.{}) catch unreachable;
-var stdin = std.fs.File.stdin();
-    var buf: [16]u8 =  [_]u8{0} ** 16;
-    var c  : usize = 0;
-    while (c == 0) {
-        c = stdin.read(&buf) catch unreachable;
-    }
-}
-
 //=======================================================================
 
 
@@ -150,6 +146,7 @@ pub const COMLDA = struct {
     reply : bool ,
     abort : bool ,
     user : [] const u8 ,
+
     init : [] const u8 ,
     echo : [] const u8 ,
     // alpha numeric
@@ -181,7 +178,7 @@ fn isFile(name: []const u8 ) bool {
     const xDIR = std.fs.cwd().openDir(dirfile,.{}) catch unreachable;
     xDIR.access(name, .{.mode = .read_write}) catch |e| switch (e) {
         error.FileNotFound => return false,
-        else => {},
+        else => { Perror(std.fmt.allocPrint(allocZmmap,"{}",.{e}) catch unreachable); },
     };
     return true;
 }
