@@ -177,7 +177,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                     6, 32,    // Name , posx posy
                     30,        // width
                     "ABCD", // text
-                    true,    // tofill
+                    false,    // tofill
                     "required", // error msg
                     "please enter text Alpha Uppercase", // help
                     "",        // regex
@@ -252,8 +252,8 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                 15, 32,        // Name , posx posy
                 10,            // width
                 2,            // scal
-                "001.02",    // text
-                true,        // tofill
+                "001.02",     // text
+                false,        // tofill
                 "Invalide value", // error msg
                 "",            // help default
                 "",            // regex default standard
@@ -265,7 +265,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                 10,            // width
                 2,            // scal
                 "+001.02",    // text
-                true,        // tofill
+                false,        // tofill
                 "Invalide value", // error msg
                 "",            // help default
                 "",            // regex default standard
@@ -275,7 +275,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                 "dateiso",
                 18, 32,            // Name , posx posy
                 "1951-10-12",    // text
-                true,            // tofill
+                false,            // tofill
                 "required",        // error msg
                 "",                // help default
     )) catch unreachable;
