@@ -23,14 +23,13 @@ pub inline fn WriteAll( args: anytype) void {
     out.interface.writeAll(args) catch {};
 }
 
-
-var in = std.fs.File.stdin().readerStreaming(&.{});
 fn Pause() void{
+    var in = std.fs.File.stdin();
     WriteAll("Pause\r\n");
     var buf: [16]u8 =  undefined;
     var c  : usize = 0;
     while (c <= 0) {
-        c = in.interface.readVec(&.{&buf}) catch unreachable;
+        c = in.read(&buf) catch unreachable;
     }
 }
 
