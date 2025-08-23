@@ -9,6 +9,9 @@ const std = @import("std");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
 // forms
 const forms = @import("forms");
 
@@ -406,7 +409,7 @@ pub fn jsonDecode(my_json : []const u8) !void {
                           @tagName(Rpanel.keyForIndex(n)),
                           @tagName(Rbutton.keyForIndex(v))}));
 
-                        ENRG.button.append(bt) catch unreachable;
+                        ENRG.button.append(mem.allocTui,bt) catch unreachable;
                     }
                   }
                 }
@@ -474,7 +477,7 @@ pub fn jsonDecode(my_json : []const u8) !void {
                           @tagName(Rpanel.keyForIndex(n)),
                           @tagName(Rbutton.keyForIndex(v))}));
 
-                        ENRG.label.append(lb) catch unreachable;
+                        ENRG.label.append(mem.allocTui,lb) catch unreachable;
                     }
 
                   }
@@ -637,8 +640,9 @@ pub fn main() !void {
 
 
     // init arraylist 
-    ENRG.button = std.ArrayList(DEFBUTTON).init(allocator);
-    ENRG.label = std.ArrayList(DEFLABEL).init(allocator);
+    ENRG.button = std.ArrayList(DEFBUTTON).initCapacity(mem.allocTui,0) catch unreachable;
+    ENRG.label = std.ArrayList(DEFLABEL).initCapacity(mem.allocTui,0) catch unreachable;
+
 
     // return  catch after panic
 

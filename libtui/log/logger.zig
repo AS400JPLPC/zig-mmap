@@ -10,6 +10,7 @@ var flog :std.fs.File = undefined;
 
 const allocator = std.heap.page_allocator;
 
+
 pub fn customLog(
     comptime message_level: std.log.Level,
     comptime scope: @Type(.@"enum_literal"),
@@ -30,11 +31,11 @@ pub fn customLog(
     const out_buffer: []u8 =  allocator.alloc(u8, 4096) catch unreachable;
     defer allocator.free(out_buffer);
     var writer =std.Io.Writer.fixed(out_buffer);
-        nosuspend {
+            nosuspend {
             writer.print("[" ++  level_txt ++ scope_name ++  "] " ++ format ++ "\n", args) catch return;
             flog.writeAll(writer.buffered()) catch unreachable;
         }
-}
+    }
 
 pub fn scoped(comptime scope: @Type(.@"enum_literal")) type {
     return struct {
@@ -58,7 +59,7 @@ pub fn scoped(comptime scope: @Type(.@"enum_literal")) type {
 
 pub fn openFile(log:[]const u8) void {
     flog = std.fs.cwd().createFile(log, .{ .read = true }) 
-        catch { @panic("impossible ouvrir file zlog;txt");};
+        catch { @panic("impossible ouvrir file ...log.txt");};
 }
 
 pub fn closeFile() void {

@@ -1,4 +1,4 @@
-**Attention ZIG  0.15.dev   incompatible avec  0.14.1 **
+**Attention ZIG  0.15.1   incompatible avec  0.14.1 **
 
 
 
@@ -622,4 +622,8 @@ var LDA = map.echoMmap(pgmPARM)
 *   •upgrade  2025-08-02.<BR />   
 *Alignment of Print WriteAll functions in all modules and Pause.<BR />
 This is for my tests, to see how it goes and check, and to see how the memory is managed.
+<BR /><BR />
+
+*   •upgrade  2025-08-23.<BR />   
+version 0.15.1 zig
 <BR /><BR />

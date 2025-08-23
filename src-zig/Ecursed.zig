@@ -16,6 +16,10 @@ const term = @import("cursed");
 // keyboard
 const kbd = @import("cursed").kbd;
 
+// allocator
+const mem = @import("alloc");
+
+
 // error
 const dsperr = @import("forms").dsperr;
 
@@ -104,70 +108,70 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     // Label
     // Name , pos X, pos Y,
     // Text , Attribut Text
-    Panel.label.append(lbl.newLabel("free",2,2,"Text-Free...................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("free",2,2,"Text-Free...................:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
     ) catch unreachable ;
     
-    Panel.label.append(lbl.newLabel("cb01",3,62,"Fonction 01..:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("cb01",3,62,"Fonction 01..:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("cb02",4,62,"Fonction 02..:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("cb02",4,62,"Fonction 02..:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("alpha",5,2,"Text-Alpha..................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("alpha",5,2,"Text-Alpha..................:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("alphaupper",6,2,"Text-Alpha-Uppercase........:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("alphaupper",6,2,"Text-Alpha-Uppercase........:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("alphanumeric",7,2,"Text-Alpha-Numeric..........:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("alphanumeric",7,2,"Text-Alpha-Numeric..........:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("alphanumericupper",8,2,"Text-Alpha-Numeric-Upercase.:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("alphanumericupper",8,2,"Text-Alpha-Numeric-Upercase.:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("password",10,2,"Text-Password...............:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("password",10,2,"Text-Password...............:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("yesno",11,2,"Text-Yes or No..............:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("yesno",11,2,"Text-Yes or No..............:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("udigit",13,2,"Text-Unsigned.Digit.........:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("udigit",13,2,"Text-Unsigned.Digit.........:")
     ) catch unreachable ;    
 
-    Panel.label.append(lbl.newLabel("digit",14,2,"Text-signed.Digit...........:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("digit",14,2,"Text-signed.Digit...........:")
     ) catch unreachable ; 
 
-    Panel.label.append(lbl.newLabel("udecimal",15,2,"Text-unsigned.Ddecimal......:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("udecimal",15,2,"Text-unsigned.Ddecimal......:")
     ) catch unreachable ; 
 
-    Panel.label.append(lbl.newLabel("decimal",16,2,"Text-signed.Ddecimal........:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("decimal",16,2,"Text-signed.Ddecimal........:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("dateiso",18,2,"Text-Date-ISO...............:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("dateiso",18,2,"Text-Date-ISO...............:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("datefr",19,2,"Text-Date-FR................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("datefr",19,2,"Text-Date-FR................:")
     ) catch unreachable;     
 
-    Panel.label.append(lbl.newLabel("dateus",20,2,"Text-Date-US................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("dateus",20,2,"Text-Date-US................:")
     ) catch unreachable;
 
-    Panel.label.append(lbl.newLabel("telephone",22,2,"Text-Telephone..US..........:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("telephone",22,2,"Text-Telephone..US..........:")
     ) catch unreachable;
 
-    Panel.label.append(lbl.newLabel("telephone2",24,2,"Text-Telephone..Standard....:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("telephone2",24,2,"Text-Telephone..Standard....:")
     ) catch unreachable;
 
-    Panel.label.append(lbl.newLabel("mail",26,2,"Text-Mail...................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("mail",26,2,"Text-Mail...................:")
     ) catch unreachable; 
 
-    Panel.label.append(lbl.newLabel("switch",28,2,"Text-Switch.................:",)
+    Panel.label.append(mem.allocTui,lbl.newLabel("switch",28,2,"Text-Switch.................:",)
     ) catch unreachable; 
 
-    Panel.label.append(lbl.newTitle("TITLE",29,70,"Title ex : FACTURE",)
+    Panel.label.append(mem.allocTui,lbl.newTitle("TITLE",29,70,"Title ex : FACTURE",)
     ) catch unreachable; 
 
     //example: option specific
@@ -178,7 +182,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
  // Field 
 
     
-    Panel.field.append(fld.newFieldTextFree("free",2,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldTextFree("free",2,32,        // Name , posx posy
                                         30,                        // width
                                         "free",                    // text
                                         true,                    // tofill
@@ -188,7 +192,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldTextFull("full",3,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldTextFull("full",3,32,        // Name , posx posy
                                         30,                        // width
                                         "full",                    // text
                                         true,                    // tofill
@@ -200,7 +204,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
     fld.setProtect(Panel,1,true) catch unreachable;
 
-    Panel.field.append(fld.newFieldAlpha("alpha",5,32,                // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldAlpha("alpha",5,32,                // Name , posx posy
                                         30,                            // width
                                         "abcd",                        // text
                                         true,                        // tofill
@@ -211,7 +215,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     ) catch unreachable ;
     
     
-    Panel.field.append(fld.newFieldAlphaUpper("alphaU",6,32,                    // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldAlphaUpper("alphaU",6,32,                    // Name , posx posy
                                         30,                                        // width
                                         "ABCD",                                    // text
                                         true,                                    // tofill
@@ -221,7 +225,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldAlphaNumeric("alphaN",7,32,                // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldAlphaNumeric("alphaN",7,32,                // Name , posx posy
                                         30,                                    // width
                                         "abcd12345",                        // text
                                         true,                                // tofill
@@ -231,7 +235,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldAlphaNumericUpper("alphaNU",8,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldAlphaNumericUpper("alphaNU",8,32,        // Name , posx posy
                                         30,                                    // width
                                         "ABCD12345",                        // text
                                         true,                                // tofill
@@ -241,7 +245,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldPassword("password",10,32,                // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldPassword("password",10,32,                // Name , posx posy
                                         30,                                    // width
                                         "SECRET",                            // text
                                         true,                                // tofill
@@ -251,7 +255,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldYesNo("yesno",11,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldYesNo("yesno",11,32,        // Name , posx posy
                                         "N",                // text
                                         true,                // tofill
                                         "required Y or N",    // error msg
@@ -259,7 +263,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDigit("udigit",13,32,            // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldUDigit("udigit",13,32,            // Name , posx posy
                                         5,                            // width
                                         "00102",                    // text
                                         true,                        // tofill
@@ -269,7 +273,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldDigit("digit",14,32,            // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldDigit("digit",14,32,            // Name , posx posy
                                         5,                        // width
                                         "+00102",                // text
                                         true,                    // tofill
@@ -279,7 +283,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldUDecimal("udecimal",15,32,         // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldUDecimal("udecimal",15,32,         // Name , posx posy
                                         10,                         // width
                                         2,                        // scal
                                         "001.02",                // text
@@ -290,7 +294,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldDecimal("decimal",16,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldDecimal("decimal",16,32,        // Name , posx posy
                                         10,                        // width
                                         2,                        // scal
                                         "+001.02",                // text
@@ -301,7 +305,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldDateISO("dateiso",18,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldDateISO("dateiso",18,32,        // Name , posx posy
                                         "1951-10-12",            // text
                                         true,                    // tofill
                                         "required",                // error msg
@@ -309,7 +313,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldDateFR("datefr",19,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldDateFR("datefr",19,32,        // Name , posx posy
                                         "12/10/1951",            // text
                                         true,                    // tofill
                                         "required",                // error msg
@@ -317,7 +321,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldDateUS("dateus",20,32,            // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldDateUS("dateus",20,32,            // Name , posx posy
                                         "07/04/1776",                // text
                                         true,                        // tofill
                                         "required",                    // error msg
@@ -325,7 +329,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldTelephone("telephone",22,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldTelephone("telephone",22,32,        // Name , posx posy
                                         25,                            // width
                                         "+(001)451 452 453 545",    // text
                                         true,                        // tofill
@@ -335,7 +339,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
 
-    Panel.field.append(fld.newFieldTelephone("telephone2",24,32,            // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldTelephone("telephone2",24,32,            // Name , posx posy
                                         25,                                     // width
                                         "+(33)6 01 02 03 04",                // text
                                         false,                                // tofill
@@ -345,7 +349,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldMail("mail",26,32,            // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldMail("mail",26,32,            // Name , posx posy
                                         100,                    // width
                                         "gloups@gmail.com",        // text error
                                         true,                    // tofill
@@ -354,14 +358,14 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                                         )
     ) catch unreachable ;
     
-    Panel.field.append(fld.newFieldSwitch("Switch",28,32,        // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldSwitch("Switch",28,32,        // Name , posx posy
                                         true,                    // switch
                                         "required",                // error msg
                                         "",                        // help
                                         )
     ) catch unreachable ;
 
-     Panel.field.append(fld.newFieldFunc("cb01",3,76,            // Name , posx posy
+     Panel.field.append(mem.allocTui,fld.newFieldFunc("cb01",3,76,            // Name , posx posy
                                         20,                        // width
                                         "Amis",                    // text
                                         true,                    // tofill
@@ -373,7 +377,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
     
     fld.setCall(Panel,fld.getIndex(Panel,"cb01") catch unreachable,"exCallpgm") catch unreachable; // test appel pgm
     
-    Panel.field.append(fld.newFieldFunc("cb02",4,76,            // Name , posx posy
+    Panel.field.append(mem.allocTui,fld.newFieldFunc("cb02",4,76,            // Name , posx posy
                                         20,                        // width
                                         "",                        // text
                                         false,                    // tofill
@@ -385,7 +389,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
 
 
     // button--------------------------------------------------
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F3,                    // function
                         true,                    // show 
                         false,                    // check field
@@ -393,7 +397,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F2,                    // function
                         true,                    // show
                         true,                    // check field
@@ -401,7 +405,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F4,                    // function
                         true,                    // show
                         true,                    // check field
@@ -409,7 +413,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F5,                    // function
                         true,                    // show
                         false,                    // check field
@@ -417,7 +421,7 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F8,                    // function
                         true,                    // show 
                         false,                    // check control to Field 
@@ -425,14 +429,14 @@ pub fn Panel_Fmt01() *pnl.PANEL {
                         )
     ) catch unreachable ;
 
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F12,                // function
                         true,                    // show 
                         false,                    // check control to Field 
                         "ClearPanel"            // title enrg record
                         )
     ) catch unreachable ;
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F24,                // function
                         true,                    // show 
                         false,                    // check control to Field 
@@ -464,14 +468,14 @@ pub fn Panel_Fmt0X() *pnl.PANEL {
     // Label
     // Name , pos X, pos Y,
     // Text , Attribut Text
-    Panel.label.append(lbl.newLabel("free",2,2,"Text-Free...................:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("free",2,2,"Text-Free...................:")
     ) catch unreachable ;
 
-    Panel.label.append(lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
+    Panel.label.append(mem.allocTui,lbl.newLabel("full",3,2,"Text-Full.....protect.......:")
     ) catch unreachable ;
 
     // button--------------------------------------------------
-    Panel.button.append(btn.newButton(
+    Panel.button.append(mem.allocTui,btn.newButton(
                         kbd.F12,                // function
                         true,                    // show 
                         false,                    // check field
@@ -512,7 +516,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
                     grd.CADRE.line1,
                     );
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);    
+    defer mem.allocTui.destroy(Xcombo);    
 
     grd.newCell(Xcombo,"Choix",15,grd.REFTYP.TEXT_FREE,term.ForegroundColor.fgGreen);
     grd.setHeaders(Xcombo) ;
@@ -532,7 +536,7 @@ fn comboFn01( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
     // Interrogation
     var Gkey :grd.GridSelect = undefined ;
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
 
     Gkey =grd.ioCombo(Xcombo,cellPos);
     pnl.rstPanel(grd.GRID,Xcombo, vpnl);
@@ -555,7 +559,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
                                         );
 
     defer grd.freeGrid(Xcombo);
-    defer grd.allocatorGrid.destroy(Xcombo);
+    defer mem.allocTui.destroy(Xcombo);
 
     grd.newCell(Xcombo,"Choix",15, grd.REFTYP.TEXT_FREE, term.ForegroundColor.fgGreen);
     grd.setHeaders(Xcombo) ;
@@ -570,7 +574,7 @@ fn comboFn02( vpnl : *pnl.PANEL , vfld :* fld.FIELD) void {
 
     // Interrogation
     var Gkey :grd.GridSelect = undefined ;
-    defer Gkey.Buf.deinit();
+    defer Gkey.Buf.deinit(mem.allocTui);
 
     Gkey =grd.ioCombo(Xcombo,cellPos);
     pnl.rstPanel(grd.GRID,Xcombo, vpnl);
@@ -608,8 +612,7 @@ var callFunc: FnEnum = undefined;
 
 pub fn deinitWrk() void {
     term.deinitTerm();
-    grd.deinitGrid();
-    utl.deinitUtl();
+    mem.deinitUtl();
 }
 
 //test ---------- pas de sortie output
@@ -809,10 +812,9 @@ if (nParm == 2 ) {
 
     while (true) {
         // clean works
-        term.deinitTerm();
-        grd.deinitGrid();
-        utl.deinitUtl();
-        
+        deinitWrk();
+
+                
         Tkey.Key = pnl.ioPanel(pFmt01);
         
         switch (Tkey.Key) {
@@ -831,7 +833,7 @@ if (nParm == 2 ) {
                 _= pnl.ioPanel(pFmt0X);
                 pnl.rstPanel(pnl.PANEL,pFmt0X, pFmt01);
                 pnl.freePanel(pFmt0X);
-                forms.allocatorForms.destroy(pFmt0X);
+                mem.allocTui.destroy(pFmt0X);
             },
             .F5 => {
                 const nitem = mnu.ioMenu(mMenu01,0);
@@ -841,7 +843,7 @@ if (nParm == 2 ) {
             .F8 => {
                 var Gkey :grd.GridSelect = undefined ;
                 Gkey.Key = term.kbd.none;
-                Gkey.Buf = std.ArrayList([]const u8).init(grd.allocatorGrid);
+                Gkey.Buf = std.ArrayList([]const u8).initCapacity(mem.allocTui,0) catch unreachable;
 
                 // Grid ---------------------------------------------------------------
                 var Grid01 : *grd.GRID =    grd.newGridC(
@@ -921,10 +923,8 @@ if (nParm == 2 ) {
                 pnl.rstPanel(grd.GRID,Grid01, pFmt01);
                 // if you have several grids please do a freeGrid on exit and a reloadGrid on enter
                 grd.freeGrid(Grid01);
-                grd.allocatorGrid.destroy(Grid01);
-                Gkey.Buf.deinit();
-                grd.deinitGrid();
-                // for debug control memoire in test CODELLDB
+                mem.allocTui.destroy(Grid01);
+                Gkey.Buf.deinit(mem.allocTui);                 // for debug control memoire in test CODELLDB
                 // _= kbd.getKEY();
             },
 
@@ -937,11 +937,11 @@ if (nParm == 2 ) {
             .F24 => {
             // function enrg file record
                 pnl.freePanel(pFmt01);
-                forms.deinitForms();
+                mem.deinitTui();
                 deinitWrk();
                 pFmt01 = Panel_Fmt01();
                 pnl.printPanel(pFmt01);
-            },
+           },
             else => {},
         }
         if (Tkey.Key == kbd.F3) break; // end work

@@ -36,6 +36,8 @@ pub fn build(b: *std.Build) void {
     const library_dep = b.dependency("libtui", .{});
 
     // Import the smaller 'cursed' and 'utils' modules exported by the library. etc...
+
+    Prog.root_module.addImport("alloc", library_dep.module("alloc"));    
     Prog.root_module.addImport("cursed", library_dep.module("cursed"));
     Prog.root_module.addImport("utils", library_dep.module("utils"));
     Prog.root_module.addImport("mvzr", library_dep.module("mvzr"));
