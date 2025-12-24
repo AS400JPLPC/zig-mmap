@@ -60,7 +60,7 @@ unsigned int COL=	132;	  /// max 132
 unsigned int ROW =	42;		/// max 42 including a line for the system
 
 /// defined not optional
-#define VTEFONT	"Noto Sans Mono  Regular"
+#define VTEFONT	"SourceCodePro"
 
 //*******************************************************
 // PROGRAME
@@ -190,8 +190,8 @@ void	init_Terminal()
 		ROW = 42;
 		}
 	else if ( s->width > 1920  ) {								//  ex: 2560 x1600 => 27"
-		sprintf(font_terminal,"%s %s" , VTEFONT,"15");
-		COL = 124;
+		sprintf(font_terminal,"%s %s" , VTEFONT,"13");
+		COL = 160;
 		ROW = 44;
 	}
 
@@ -233,7 +233,9 @@ void term_spawn_callback(VteTerminal *terminal, GPid pid, GError *error, gpointe
 
 void on_title_changed(GtkWidget *terminal)
 {
-	gtk_window_set_title(GTK_WINDOW(window), vte_terminal_get_window_title(VTE_TERMINAL(terminal)));
+	const char *title;
+    title = vte_terminal_get_termprop_string_by_id(VTE_TERMINAL(terminal), VTE_PROPERTY_ID_XTERM_TITLE, NULL);
+    gtk_window_set_title (GTK_WINDOW(window), title);
 }
 
 /// -----------------------------------------------------------------------------
@@ -242,7 +244,9 @@ void on_title_changed(GtkWidget *terminal)
 
 void on_resize_window(GtkWidget *terminal, guint  _col, guint _row)
 {
+    gtk_window_set_resizable (GTK_WINDOW(window),true);
 	vte_terminal_set_size (VTE_TERMINAL(terminal),_col,_row);
+	gtk_window_set_resizable (GTK_WINDOW(window),false);
 	gtk_widget_show_all(window);
 }
 
@@ -299,7 +303,6 @@ gchar *arg_3[] =  { (gchar*) argv[1], (gchar*) argv[1],(gchar*)argv[2], NULL};		
 	if (argc == 1 )  {
 		if ( false == ctrlPgm(WORKPGM))					return EXIT_FAILURE;	// contrôle file autorisation
 		if ( false == exists_File(WORKPGM) ) 			return EXIT_FAILURE;	// contrôle si programme
-		dir = std::filesystem::path(WORKPGM).parent_path().c_str();
 		command = arg_1;
 	}
 	if (argc == 2 )  {
